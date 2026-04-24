@@ -96,7 +96,7 @@ def lane_result_to_dict(lanes: LaneResult) -> dict[str, Any]:
 
 
 def detection_to_dict(detection: Detection) -> dict[str, Any]:
-    return {
+    payload = {
         "kind": detection.kind,
         "label": detection.label,
         "confidence": round(float(detection.confidence), 4),
@@ -105,6 +105,10 @@ def detection_to_dict(detection: Detection) -> dict[str, Any]:
         "track_id": detection.track_id,
         "distance_m": round(float(detection.distance_m), 3) if detection.distance_m is not None else None,
     }
+    if detection.ground_position_m is not None:
+        x_m, z_m = detection.ground_position_m
+        payload["ground_position_m"] = {"x": round(float(x_m), 3), "z": round(float(z_m), 3)}
+    return payload
 
 
 def box_to_dict(box: Box) -> dict[str, int]:

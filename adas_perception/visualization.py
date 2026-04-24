@@ -97,12 +97,13 @@ def _draw_detection(
         return
     track = f"#{detection.track_id} " if detection.track_id is not None else ""
     distance = _format_distance(detection.distance_m, viz_config)
+    ground = _format_ground_position(detection.ground_position_m, viz_config)
     if style == "kind":
-        label = f"{track}{detection.kind}{distance}"
+        label = f"{track}{detection.kind}{distance}{ground}"
     elif style == "compact":
-        label = f"{track}{detection.kind} {detection.confidence:.2f}{distance}"
+        label = f"{track}{detection.kind} {detection.confidence:.2f}{distance}{ground}"
     else:  # full
-        label = f"{track}{detection.kind}:{detection.label} {detection.confidence:.2f}{distance}"
+        label = f"{track}{detection.kind}:{detection.label} {detection.confidence:.2f}{distance}{ground}"
     _put_label(
         vis,
         label,
@@ -203,3 +204,17 @@ def _format_distance(distance_m: float | None, viz_config: dict[str, Any]) -> st
             return f" ~{int(round(distance_m / 5) * 5)}m"
         return f" ~{int(round(distance_m))}m"
     return f" ~{distance_m:.1f}m"
+
+
+def _format_ground_position(
+    ground_position_m: tuple[float, float] | None,
+    viz_config: dict[str, Any],
+) -> str:
+    """Format ground-plane (X, Z) position. Off by default; opt in via
+    `visualization.show_ground_position: true`. Empty string when the
+    estimator did not produce a position (camera_height_m unset, or bbox
+    bottom at/above the horizon)."""
+    if ground_position_m is None or not viz_config.get("show_ground_position", False):
+        return ""
+    x_m, z_m = ground_position_m
+    return f" [x={x_m:+.1f},z={z_m:.1f}m]"
