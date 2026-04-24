@@ -70,9 +70,15 @@ def _draw_lanes(vis: np.ndarray, result: PerceptionResult, viz_config: dict[str,
         cv2.line(vis, start, end, (90, 90, 90), 1, cv2.LINE_AA)
 
     for lane_line in result.lanes.lines:
-        start, end = lane_line.points
-        cv2.line(vis, start, end, COLORS["lane"], 5, cv2.LINE_AA)
-        _put_label(vis, lane_line.side, start, COLORS["lane"], font_scale=0.50)
+        if lane_line.polyline and len(lane_line.polyline) >= 2:
+            pts = np.array(lane_line.polyline, dtype=np.int32).reshape((-1, 1, 2))
+            cv2.polylines(vis, [pts], False, COLORS["lane"], 5, cv2.LINE_AA)
+            anchor = lane_line.polyline[0]
+        else:
+            start, end = lane_line.points
+            cv2.line(vis, start, end, COLORS["lane"], 5, cv2.LINE_AA)
+            anchor = start
+        _put_label(vis, lane_line.side, anchor, COLORS["lane"], font_scale=0.50)
 
 
 def _draw_detection(
