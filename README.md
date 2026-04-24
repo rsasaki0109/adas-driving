@@ -335,7 +335,7 @@ python scripts/evaluate_bdd100k.py \
 - `traffic_lights`: HSV色範囲と赤/黄/緑の信号候補フィルタ
 - `lane_smoothing`: 動画向けの車線平滑化
 - `tracking`: 車両・歩行者向けのトラッキング (IoU + オプションの線形運動予測 + 重心距離fallback)
-- `distance_estimation`: 仮想カメラFOVとbbox高さによる粗い距離推定
+- `distance_estimation`: bbox 高さと仮定物体高さによる粗い距離推定。`intrinsics.fy` (vertical focal length [px]) を指定すると校正値ベースで推定、`focal_length_px` の直接指定もできます。これらが無いときは `horizontal_fov_degrees` (default 70°) から fx を計算する fallback。優先順は `intrinsics.fy > focal_length_px > horizontal_fov_degrees`
 - `visualization`: 描画の太さ、透明度、サマリー表示、kind filter、ラベル style、最小 confidence
 
 追加設定はdefaultへの上書きとして読み込まれます。
