@@ -1,0 +1,65 @@
+# BDD100K 1024px kind-tuned detector with an experimental 2x2 tile pass.
+# The full-frame pass is kept for context, while tile detections are limited to
+# tiny/small boxes so large-object behavior is mostly driven by the full frame.
+objects:
+  enabled: true
+  backend: ultralytics
+  model: outputs/models/adas_yolov8n_bdd100k.pt
+  device: auto
+  image_size: 1024
+  score_threshold: 0.15
+  score_thresholds_by_kind:
+    pedestrian: 0.20
+    vehicle: 0.25
+    traffic_sign: 0.25
+    traffic_light: 0.20
+  iou_threshold: 0.50
+  max_detections: 240
+  class_groups:
+    pedestrian:
+      - pedestrian
+      - rider
+    vehicle:
+      - bicycle
+      - bus
+      - car
+      - motorcycle
+      - train
+      - truck
+    traffic_sign:
+      - traffic sign
+    traffic_light:
+      - traffic light
+  tile_inference:
+    enabled: true
+    include_full_frame: true
+    rows: 2
+    cols: 2
+    overlap_ratio: 0.20
+    image_size: 1024
+    max_detections: 120
+    combined_max_detections: 360
+    max_box_area_ratio: 0.0025
+    kinds:
+      - pedestrian
+      - vehicle
+      - traffic_sign
+      - traffic_light
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true

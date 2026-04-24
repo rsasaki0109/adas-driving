@@ -1,0 +1,50 @@
+# tl-only copy-paste v2 model + TTA + per-kind thresholds re-tuned on the
+# even-index 1,000 tune split. Report on odd-index 5,000 frames.
+objects:
+  enabled: true
+  backend: ultralytics
+  model: outputs/models/adas_yolov8n_bdd100k_even_copy_paste_v2_tl_1000_1024_1ep.pt
+  device: auto
+  image_size: 1024
+  augment: true
+  score_threshold: 0.20
+  score_thresholds_by_kind:
+    pedestrian: 0.35
+    vehicle: 0.30
+    traffic_sign: 0.30
+    traffic_light: 0.30
+  iou_threshold: 0.50
+  max_detections: 240
+  class_groups:
+    pedestrian:
+      - pedestrian
+      - rider
+    vehicle:
+      - bicycle
+      - bus
+      - car
+      - motorcycle
+      - train
+      - truck
+    traffic_sign:
+      - traffic sign
+    traffic_light:
+      - traffic light
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true

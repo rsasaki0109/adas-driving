@@ -1,0 +1,10 @@
+# Heuristic-only profile for environments without model weights or for quick smoke tests.
+objects:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+

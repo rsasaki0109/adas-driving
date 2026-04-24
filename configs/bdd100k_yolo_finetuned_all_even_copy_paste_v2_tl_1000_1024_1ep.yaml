@@ -1,0 +1,53 @@
+# BDD100K even-index traffic_light-only copy-paste v2 (grabcut + feather, 1000
+# paste imgs) training experiment at 1024px. Trained for 1 epoch from
+# outputs/models/adas_yolov8n_bdd100k.pt on even-index BDD100K validation-mirror
+# frames plus train-only copy-paste augmentation restricted to "traffic light"
+# sources (the class v2 mixed copy-paste helped, while pedestrian / traffic_sign
+# regressed). Report on the held-out odd-index frames.
+objects:
+  enabled: true
+  backend: ultralytics
+  model: outputs/models/adas_yolov8n_bdd100k_even_copy_paste_v2_tl_1000_1024_1ep.pt
+  device: auto
+  image_size: 1024
+  score_threshold: 0.15
+  score_thresholds_by_kind:
+    pedestrian: 0.20
+    vehicle: 0.25
+    traffic_sign: 0.25
+    traffic_light: 0.20
+  iou_threshold: 0.50
+  max_detections: 240
+  class_groups:
+    pedestrian:
+      - pedestrian
+      - rider
+    vehicle:
+      - bicycle
+      - bus
+      - car
+      - motorcycle
+      - train
+      - truck
+    traffic_sign:
+      - traffic sign
+    traffic_light:
+      - traffic light
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true

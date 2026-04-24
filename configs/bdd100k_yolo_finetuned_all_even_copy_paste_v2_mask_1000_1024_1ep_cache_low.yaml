@@ -1,0 +1,51 @@
+# Low-threshold cache config for copy-paste v2 mask 1000 threshold sweeps.
+# This is not a recommended demo setting; it keeps more raw detections so
+# scripts/sweep_bdd100k_cached_predictions.py can evaluate thresholds without
+# re-running YOLO for each candidate.
+objects:
+  enabled: true
+  backend: ultralytics
+  model: outputs/models/adas_yolov8n_bdd100k_even_copy_paste_v2_mask_1000_1024_1ep.pt
+  device: auto
+  image_size: 1024
+  score_threshold: 0.05
+  score_thresholds_by_kind:
+    pedestrian: 0.05
+    vehicle: 0.05
+    traffic_sign: 0.05
+    traffic_light: 0.05
+  iou_threshold: 0.50
+  max_detections: 500
+  class_groups:
+    pedestrian:
+      - pedestrian
+      - rider
+    vehicle:
+      - bicycle
+      - bus
+      - car
+      - motorcycle
+      - train
+      - truck
+    traffic_sign:
+      - traffic sign
+    traffic_light:
+      - traffic light
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true

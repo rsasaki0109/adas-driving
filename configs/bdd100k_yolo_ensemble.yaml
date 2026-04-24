@@ -1,0 +1,52 @@
+# BDD100K evaluation profile that combines:
+# - COCO-pretrained YOLOv8n for vehicles/pedestrians
+# - BDD100K fine-tuned YOLOv8n for traffic signs/lights
+objects:
+  enabled: true
+  device: auto
+  detectors:
+    - backend: ultralytics
+      model: yolov8n.pt
+      image_size: 640
+      score_threshold: 0.20
+      iou_threshold: 0.50
+      max_detections: 160
+      class_groups:
+        pedestrian:
+          - person
+        vehicle:
+          - bicycle
+          - car
+          - motorcycle
+          - bus
+          - truck
+          - train
+    - backend: ultralytics
+      model: outputs/models/sign_light_yolov8n_bdd100k.pt
+      image_size: 640
+      score_threshold: 0.20
+      iou_threshold: 0.50
+      max_detections: 200
+      class_groups:
+        traffic_sign:
+          - traffic sign
+        traffic_light:
+          - traffic light
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true

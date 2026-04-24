@@ -1,0 +1,55 @@
+# Low-threshold cache config for current best weights + CLAHE preprocessing + TTA.
+# Intended as a WBF fusion source that provides illumination-diversity for
+# night/rainy scenes (inspired by weakness analysis on conditional eval).
+# CLAHE (Contrast-Limited Adaptive Histogram Equalization) is applied in LAB
+# space on the L channel before Ultralytics inference, so the YOLO sees a
+# brightness-enhanced version of each frame.
+objects:
+  enabled: true
+  backend: ultralytics
+  model: outputs/models/adas_yolov8n_bdd100k.pt
+  device: auto
+  image_size: 1024
+  augment: true
+  preprocess: clahe
+  score_threshold: 0.05
+  score_thresholds_by_kind:
+    pedestrian: 0.05
+    vehicle: 0.05
+    traffic_sign: 0.05
+    traffic_light: 0.05
+  iou_threshold: 0.50
+  max_detections: 500
+  class_groups:
+    pedestrian:
+      - pedestrian
+      - rider
+    vehicle:
+      - bicycle
+      - bus
+      - car
+      - motorcycle
+      - train
+      - truck
+    traffic_sign:
+      - traffic sign
+    traffic_light:
+      - traffic light
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true

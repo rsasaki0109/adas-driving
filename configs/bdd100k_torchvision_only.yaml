@@ -1,0 +1,26 @@
+# Public-data evaluation profile that isolates TorchVision detections.
+# Useful for separating model quality from heuristic sign/light candidates.
+objects:
+  enabled: true
+  model: ssdlite320_mobilenet_v3_large
+  weights: DEFAULT
+  score_threshold: 0.20
+  max_detections: 120
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true

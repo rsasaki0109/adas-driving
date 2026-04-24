@@ -1,0 +1,57 @@
+# Current best weights + TTA + per-kind thresholds + tiny-bucket override for
+# traffic_light (0.30 -> 0.25) and traffic_sign (0.35 -> 0.30). Other kinds and
+# other size buckets keep the regular per-kind threshold. Selected by a tiny
+# threshold sweep (192 combos) on the even-index 1,000 tune split; tune-split
+# macro F1 = 0.6486, vs TTA-tuned-only 0.6468. Report on odd-index 5,000.
+objects:
+  enabled: true
+  backend: ultralytics
+  model: outputs/models/adas_yolov8n_bdd100k.pt
+  device: auto
+  image_size: 1024
+  augment: true
+  score_threshold: 0.20
+  score_thresholds_by_kind:
+    pedestrian: 0.35
+    vehicle: 0.35
+    traffic_sign: 0.35
+    traffic_light: 0.30
+  score_thresholds_by_size:
+    tiny:
+      traffic_light: 0.25
+      traffic_sign: 0.30
+  iou_threshold: 0.50
+  max_detections: 240
+  class_groups:
+    pedestrian:
+      - pedestrian
+      - rider
+    vehicle:
+      - bicycle
+      - bus
+      - car
+      - motorcycle
+      - train
+      - truck
+    traffic_sign:
+      - traffic sign
+    traffic_light:
+      - traffic light
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true
