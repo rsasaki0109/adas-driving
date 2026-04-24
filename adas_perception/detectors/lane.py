@@ -29,6 +29,15 @@ class LaneDetector:
             int(self.config.get("canny_low", 50)),
             int(self.config.get("canny_high", 150)),
         )
+
+        color_mask_config = self.config.get("color_mask", {})
+        if color_mask_config.get("enabled", False):
+            color_mask = _build_lane_color_mask(frame_bgr, color_mask_config)
+            dilate_iter = int(color_mask_config.get("dilate_iterations", 2))
+            if dilate_iter > 0:
+                color_mask = cv2.dilate(color_mask, np.ones((3, 3), np.uint8), iterations=dilate_iter)
+            edges = cv2.bitwise_and(edges, color_mask)
+
         roi_mask = np.zeros_like(edges)
         roi = self._roi_polygon(width, height)
         cv2.fillPoly(roi_mask, [roi], 255)
@@ -118,6 +127,19 @@ class LaneDetector:
         y_bottom = int(height * float(roi.get("bottom_left", [0.0, 0.96])[1]))
         y_top = int(height * float(roi.get("top_left", [0.0, 0.60])[1]))
 
+        # Outlier rejection: drop slope/intercept candidates more than k MADs
+        # away from the weighted median, then re-average. Helps when a strong
+        # but spurious edge (curb, shadow) dominates the simple weighted mean.
+        if len(candidates) >= 3:
+            slope_med = float(np.median(slopes))
+            mad = float(np.median(np.abs(slopes - slope_med))) or 1e-3
+            keep = np.abs(slopes - slope_med) <= 3.0 * mad
+            if keep.any() and keep.sum() != len(slopes):
+                slope = float(np.average(slopes[keep], weights=weights[keep]))
+                intercept = float(np.average(intercepts[keep], weights=weights[keep]))
+                if abs(slope) < 1e-3:
+                    return None
+
         x_bottom = int((y_bottom - intercept) / slope)
         x_top = int((y_top - intercept) / slope)
         x_bottom = max(0, min(width - 1, x_bottom))
@@ -129,3 +151,22 @@ class LaneDetector:
             confidence=confidence,
         )
 
+
+
+def _build_lane_color_mask(frame_bgr: np.ndarray, cfg: dict[str, Any]) -> np.ndarray:
+    """White + yellow lane marker mask in HSV.
+
+    Defaults are tuned for typical daytime road footage. Both ranges are
+    OR-merged. Tweak via cfg["white"] and cfg["yellow"], each with
+    {"hsv_lower": [H,S,V], "hsv_upper": [H,S,V]}.
+    """
+    hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV)
+    white_cfg = cfg.get("white", {})
+    yellow_cfg = cfg.get("yellow", {})
+    white_lower = np.array(white_cfg.get("hsv_lower", [0, 0, 200]), dtype=np.uint8)
+    white_upper = np.array(white_cfg.get("hsv_upper", [180, 40, 255]), dtype=np.uint8)
+    yellow_lower = np.array(yellow_cfg.get("hsv_lower", [15, 80, 120]), dtype=np.uint8)
+    yellow_upper = np.array(yellow_cfg.get("hsv_upper", [35, 255, 255]), dtype=np.uint8)
+    white_mask = cv2.inRange(hsv, white_lower, white_upper)
+    yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+    return cv2.bitwise_or(white_mask, yellow_mask)

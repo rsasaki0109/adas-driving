@@ -117,6 +117,9 @@ traffic_lights:
 
 lane:
   enabled: true
+  color_mask:
+    enabled: true
+    dilate_iterations: 2
 
 lane_smoothing:
   enabled: true

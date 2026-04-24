@@ -329,7 +329,7 @@ python scripts/evaluate_bdd100k.py \
 
 デフォルト設定は [configs/default.yaml](configs/default.yaml) にあります。
 
-- `lane`: Canny/Hough/ROIなどの車線検出パラメータ
+- `lane`: Canny/Hough/ROI などの車線検出パラメータに加え、`color_mask.enabled: true` で HSV ベースの白/黄ライン抽出を Canny edges に AND し、影や縁石の誤検出を抑制します。candidates の slope は MAD ベースの外れ値除去で robust にします
 - `objects`: 検出バックエンド、モデル、重み、デバイス、スコアしきい値、対象クラス
 - `signs`: HSV色範囲と標識候補の面積/形状フィルタ
 - `traffic_lights`: HSV色範囲と赤/黄/緑の信号候補フィルタ
