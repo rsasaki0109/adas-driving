@@ -1703,7 +1703,7 @@ outputs/bdd100k_yolo_img1024_kind_tuned_error_gallery_rainy_traffic_light/index.
 - default configは重すぎない
 - BDD100K fine-tuned configは追加weightが必要な実験設定として分ける
 
-### Phase 8: Lane recognitionを強化する
+### Phase 8: Lane recognitionを強化する (進行中 — 非ML改善 + ONNX backend skeleton 実装済み)
 
 目的:
 

@@ -10,7 +10,7 @@ import numpy as np
 from adas_perception.detectors import (
     ColorSignDetector,
     ColorTrafficLightDetector,
-    LaneDetector,
+    create_lane_detector,
     create_object_detector,
 )
 from adas_perception.distance import MonocularDistanceEstimator
@@ -24,8 +24,9 @@ class ADASPerceptionPipeline:
 
     def __init__(self, config: dict[str, Any]):
         self.config = config
+        lane_config = config.get("lane", {}) or {}
         self.lane_detector = (
-            LaneDetector(config.get("lane", {})) if config.get("lane", {}).get("enabled", True) else None
+            create_lane_detector(lane_config) if lane_config.get("enabled", True) else None
         )
         self.object_detectors = _create_object_detectors(config.get("objects", {}))
         self.fusion_config = _build_fusion_config(config.get("objects", {}).get("fusion", {}))
