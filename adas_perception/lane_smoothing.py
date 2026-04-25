@@ -51,6 +51,7 @@ class LaneSmoother:
                 side=state.line.side,
                 points=state.line.points,
                 confidence=max(0.0, state.line.confidence * (1.0 - state.missed / (self.max_missed + 1))),
+                polyline=list(state.line.polyline),
             )
             state.line = faded
             output_lines.append(faded)
@@ -67,7 +68,21 @@ def _blend_lines(previous: LaneLine, current: LaneLine, alpha: float) -> LaneLin
     start = _blend_points(previous.points[0], current.points[0], alpha)
     end = _blend_points(previous.points[1], current.points[1], alpha)
     confidence = alpha * previous.confidence + (1.0 - alpha) * current.confidence
-    return LaneLine(side=current.side, points=(start, end), confidence=confidence)
+    polyline = _blend_polylines(previous.polyline, current.polyline, alpha)
+    return LaneLine(side=current.side, points=(start, end), confidence=confidence, polyline=polyline)
+
+
+def _blend_polylines(previous: list[Point], current: list[Point], alpha: float) -> list[Point]:
+    """Blend two polylines element-wise. Falls back to whichever side has data
+    when only one is populated, and skips smoothing if lengths differ (a length
+    change usually means the fitter switched between linear and polynomial)."""
+    if not current:
+        return list(previous)
+    if not previous:
+        return list(current)
+    if len(previous) != len(current):
+        return list(current)
+    return [_blend_points(prev, cur, alpha) for prev, cur in zip(previous, current)]
 
 
 def _blend_points(previous: Point, current: Point, alpha: float) -> Point:
@@ -82,7 +97,11 @@ def _lane_polygon(lines: list[LaneLine]) -> list[Point]:
     right = by_side.get("right")
     if not left or not right:
         return []
-    left_bottom, left_top = left.points
-    right_bottom, right_top = right.points
-    return [left_bottom, left_top, right_top, right_bottom]
+    left_pts = list(left.polyline) if left.polyline else list(left.points)
+    right_pts = list(right.polyline) if right.polyline else list(right.points)
+    if not left_pts or not right_pts:
+        return []
+    left_pts.sort(key=lambda p: -p[1])  # bottom -> top
+    right_pts.sort(key=lambda p: -p[1])
+    return left_pts + list(reversed(right_pts))
 
