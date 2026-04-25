@@ -50,6 +50,7 @@ class LaneLine:
     side: str
     points: tuple[Point, Point]
     confidence: float
+    polyline: list[Point] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

@@ -58,6 +58,9 @@ class LaneDetector:
         raw_segments: list[tuple[Point, Point]] = []
         left: list[tuple[float, float, float]] = []
         right: list[tuple[float, float, float]] = []
+        # Per-side endpoint pools for polynomial fit (each x,y pair).
+        left_points: list[tuple[float, float]] = []
+        right_points: list[tuple[float, float]] = []
         min_abs_slope = float(self.config.get("min_abs_slope", 0.45))
 
         for x1, y1, x2, y2 in lines.reshape(-1, 4):
@@ -72,12 +75,26 @@ class LaneDetector:
             raw_segments.append(((int(x1), int(y1)), (int(x2), int(y2))))
             if slope < 0:
                 left.append((slope, intercept, length))
+                left_points.append((float(x1), float(y1)))
+                left_points.append((float(x2), float(y2)))
             else:
                 right.append((slope, intercept, length))
+                right_points.append((float(x1), float(y1)))
+                right_points.append((float(x2), float(y2)))
+
+        poly_cfg = self.config.get("polynomial_fit", {})
+        poly_enabled = bool(poly_cfg.get("enabled", False))
 
         lane_lines: list[LaneLine] = []
         left_line = self._fit_lane("left", left, width, height)
         right_line = self._fit_lane("right", right, width, height)
+        if poly_enabled:
+            min_pts = int(poly_cfg.get("min_points", 6))
+            samples = int(poly_cfg.get("polyline_samples", 12))
+            if len(left_points) >= min_pts:
+                left_line = self._poly_fit_lane("left", left_points, width, height, samples) or left_line
+            if len(right_points) >= min_pts:
+                right_line = self._poly_fit_lane("right", right_points, width, height, samples) or right_line
         if left_line:
             lane_lines.append(left_line)
         if right_line:
@@ -85,11 +102,19 @@ class LaneDetector:
 
         polygon: list[Point] = []
         if left_line and right_line:
-            left_bottom, left_top = left_line.points
-            right_bottom, right_top = right_line.points
-            polygon = [left_bottom, left_top, right_top, right_bottom]
+            polygon = self._build_lane_polygon(left_line, right_line)
 
         return LaneResult(lines=lane_lines, raw_segments=raw_segments, polygon=polygon)
+
+    def _build_lane_polygon(self, left_line: LaneLine, right_line: LaneLine) -> list[Point]:
+        left_pts = list(left_line.polyline) if left_line.polyline else list(left_line.points)
+        right_pts = list(right_line.polyline) if right_line.polyline else list(right_line.points)
+        if not left_pts or not right_pts:
+            return []
+        # Order each side bottom -> top; merge as left bottom..top + right top..bottom.
+        left_pts.sort(key=lambda p: -p[1])
+        right_pts.sort(key=lambda p: -p[1])
+        return left_pts + list(reversed(right_pts))
 
     def _roi_polygon(self, width: int, height: int) -> np.ndarray:
         roi_config = self.config.get("roi", {})
@@ -151,6 +176,46 @@ class LaneDetector:
             confidence=confidence,
         )
 
+
+
+    def _poly_fit_lane(
+        self,
+        side: str,
+        points: list[tuple[float, float]],
+        width: int,
+        height: int,
+        samples: int,
+    ) -> LaneLine | None:
+        if len(points) < 6:
+            return None
+        ys = np.array([p[1] for p in points], dtype=np.float64)
+        xs = np.array([p[0] for p in points], dtype=np.float64)
+        # Fit x = a*y^2 + b*y + c (treats y as the independent axis since
+        # lane markings are nearly vertical in the camera view).
+        try:
+            coeffs = np.polyfit(ys, xs, 2)
+        except Exception:
+            return None
+        roi = self.config.get("roi", {})
+        y_bottom = int(height * float(roi.get("bottom_left", [0.0, 0.96])[1]))
+        y_top = int(height * float(roi.get("top_left", [0.0, 0.60])[1]))
+        sample_count = max(2, samples)
+        ys_sampled = np.linspace(y_bottom, y_top, sample_count)
+        xs_sampled = np.polyval(coeffs, ys_sampled)
+        polyline: list[Point] = []
+        for x, y in zip(xs_sampled, ys_sampled):
+            xi = int(round(float(x)))
+            yi = int(round(float(y)))
+            xi = max(0, min(width - 1, xi))
+            yi = max(0, min(height - 1, yi))
+            polyline.append((xi, yi))
+        confidence = min(1.0, len(points) / 16.0)
+        return LaneLine(
+            side=side,
+            points=(polyline[0], polyline[-1]),
+            confidence=confidence,
+            polyline=polyline,
+        )
 
 
 def _build_lane_color_mask(frame_bgr: np.ndarray, cfg: dict[str, Any]) -> np.ndarray:

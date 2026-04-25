@@ -120,6 +120,10 @@ lane:
   color_mask:
     enabled: true
     dilate_iterations: 2
+  polynomial_fit:
+    enabled: true
+    min_points: 6
+    polyline_samples: 12
 
 lane_smoothing:
   enabled: true
