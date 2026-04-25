@@ -1,0 +1,17 @@
+# CPU-friendly profile: still runs TorchVision, but trims detections and raises the threshold.
+objects:
+  enabled: true
+  device: cpu
+  score_threshold: 0.55
+  max_detections: 40
+
+lane_smoothing:
+  enabled: true
+
+tracking:
+  enabled: true
+  max_missed: 5
+
+distance_estimation:
+  enabled: true
+

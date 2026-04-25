@@ -1,0 +1,17 @@
+# Accuracy-oriented image/video demo profile.
+# Slower than default, but uses a stronger TorchVision detector.
+objects:
+  enabled: true
+  model: retinanet_resnet50_fpn_v2
+  weights: DEFAULT
+  score_threshold: 0.35
+  max_detections: 120
+
+lane_smoothing:
+  enabled: true
+
+tracking:
+  enabled: true
+
+distance_estimation:
+  enabled: true

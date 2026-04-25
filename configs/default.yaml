@@ -1,0 +1,109 @@
+lane:
+  enabled: true
+  canny_low: 50
+  canny_high: 150
+  gaussian_kernel: 5
+  hough_rho: 2
+  hough_theta_degrees: 1
+  hough_threshold: 35
+  min_line_length: 35
+  max_line_gap: 80
+  min_abs_slope: 0.45
+  roi:
+    bottom_left: [0.08, 0.96]
+    top_left: [0.42, 0.60]
+    top_right: [0.58, 0.60]
+    bottom_right: [0.95, 0.96]
+
+objects:
+  enabled: true
+  backend: torchvision
+  model: ssdlite320_mobilenet_v3_large
+  weights: DEFAULT
+  device: auto
+  score_threshold: 0.45
+  max_detections: 80
+  class_groups:
+    pedestrian:
+      - person
+    vehicle:
+      - bicycle
+      - car
+      - motorcycle
+      - bus
+      - truck
+    traffic_sign:
+      - stop sign
+    traffic_light:
+      - traffic light
+
+signs:
+  enabled: true
+  classification:
+    enabled: true
+  min_area_ratio: 0.00008
+  max_area_ratio: 0.030
+  min_aspect_ratio: 0.45
+  max_aspect_ratio: 2.20
+  max_y_ratio: 0.88
+  color_masks:
+    red:
+      - lower: [0, 80, 70]
+        upper: [10, 255, 255]
+      - lower: [170, 80, 70]
+        upper: [180, 255, 255]
+    blue:
+      - lower: [90, 70, 60]
+        upper: [130, 255, 255]
+    yellow:
+      - lower: [18, 70, 80]
+        upper: [40, 255, 255]
+
+traffic_lights:
+  enabled: true
+  min_area_ratio: 0.000015
+  max_area_ratio: 0.0040
+  min_aspect_ratio: 0.55
+  max_aspect_ratio: 1.45
+  min_circularity: 0.45
+  max_y_ratio: 0.75
+  state_masks:
+    red:
+      - lower: [0, 100, 100]
+        upper: [10, 255, 255]
+      - lower: [170, 100, 100]
+        upper: [180, 255, 255]
+    yellow:
+      - lower: [18, 90, 120]
+        upper: [38, 255, 255]
+    green:
+      - lower: [40, 70, 90]
+        upper: [85, 255, 255]
+
+lane_smoothing:
+  enabled: true
+  alpha: 0.65
+  max_missed: 3
+
+tracking:
+  enabled: true
+  iou_threshold: 0.30
+  max_missed: 8
+  kinds:
+    - vehicle
+    - pedestrian
+
+distance_estimation:
+  enabled: true
+  horizontal_fov_degrees: 70.0
+  min_box_height_px: 12
+  max_distance_m: 120.0
+  object_heights_m:
+    pedestrian: 1.70
+    vehicle: 1.50
+
+visualization:
+  lane_alpha: 0.28
+  box_thickness: 2
+  font_scale: 0.55
+  show_summary: true

@@ -1,0 +1,140 @@
+# Demo-oriented 7-way WBF config. Uses the same fusion ceiling as
+# configs/bdd100k_yolo_wbf7_perkind_iou_online.yaml, but enables lane
+# smoothing, simple IoU tracking and monocular distance estimation so that
+# `scripts/demo_image.py` / `scripts/demo_video.py` produce a full ADAS
+# experience. For pure accuracy evaluation use the _online.yaml variant
+# instead (tracking smooths but can add latency on dense scenes).
+objects:
+  enabled: true
+  detectors:
+    - backend: ultralytics
+      model: outputs/models/adas_yolov8n_bdd100k.pt
+      image_size: 1024
+      augment: false
+      score_threshold: 0.05
+      score_thresholds_by_kind: {pedestrian: 0.05, vehicle: 0.05, traffic_sign: 0.05, traffic_light: 0.05}
+      iou_threshold: 0.50
+      max_detections: 500
+      class_groups:
+        pedestrian: [pedestrian, rider]
+        vehicle: [bicycle, bus, car, motorcycle, train, truck]
+        traffic_sign: [traffic sign]
+        traffic_light: [traffic light]
+    - backend: ultralytics
+      model: outputs/models/adas_yolov8n_bdd100k.pt
+      image_size: 1024
+      augment: true
+      score_threshold: 0.05
+      score_thresholds_by_kind: {pedestrian: 0.05, vehicle: 0.05, traffic_sign: 0.05, traffic_light: 0.05}
+      iou_threshold: 0.50
+      max_detections: 500
+      class_groups:
+        pedestrian: [pedestrian, rider]
+        vehicle: [bicycle, bus, car, motorcycle, train, truck]
+        traffic_sign: [traffic sign]
+        traffic_light: [traffic light]
+    - backend: ultralytics
+      model: outputs/models/adas_yolov8n_bdd100k_even_copy_paste_v2_tl_1000_1024_1ep.pt
+      image_size: 1024
+      augment: true
+      score_threshold: 0.05
+      score_thresholds_by_kind: {pedestrian: 0.05, vehicle: 0.05, traffic_sign: 0.05, traffic_light: 0.05}
+      iou_threshold: 0.50
+      max_detections: 500
+      class_groups:
+        pedestrian: [pedestrian, rider]
+        vehicle: [bicycle, bus, car, motorcycle, train, truck]
+        traffic_sign: [traffic sign]
+        traffic_light: [traffic light]
+    - backend: ultralytics
+      model: outputs/models/adas_yolov8n_bdd100k.pt
+      image_size: 1280
+      augment: true
+      score_threshold: 0.05
+      score_thresholds_by_kind: {pedestrian: 0.05, vehicle: 0.05, traffic_sign: 0.05, traffic_light: 0.05}
+      iou_threshold: 0.50
+      max_detections: 500
+      class_groups:
+        pedestrian: [pedestrian, rider]
+        vehicle: [bicycle, bus, car, motorcycle, train, truck]
+        traffic_sign: [traffic sign]
+        traffic_light: [traffic light]
+    - backend: ultralytics
+      model: outputs/models/adas_yolov8n_bdd100k.pt
+      image_size: 960
+      augment: true
+      score_threshold: 0.05
+      score_thresholds_by_kind: {pedestrian: 0.05, vehicle: 0.05, traffic_sign: 0.05, traffic_light: 0.05}
+      iou_threshold: 0.50
+      max_detections: 500
+      class_groups:
+        pedestrian: [pedestrian, rider]
+        vehicle: [bicycle, bus, car, motorcycle, train, truck]
+        traffic_sign: [traffic sign]
+        traffic_light: [traffic light]
+    - backend: ultralytics
+      model: outputs/models/adas_yolov8n_bdd100k.pt
+      image_size: 1536
+      augment: true
+      score_threshold: 0.05
+      score_thresholds_by_kind: {pedestrian: 0.05, vehicle: 0.05, traffic_sign: 0.05, traffic_light: 0.05}
+      iou_threshold: 0.50
+      max_detections: 500
+      class_groups:
+        pedestrian: [pedestrian, rider]
+        vehicle: [bicycle, bus, car, motorcycle, train, truck]
+        traffic_sign: [traffic sign]
+        traffic_light: [traffic light]
+    - backend: ultralytics
+      model: outputs/models/adas_yolov8n_bdd100k.pt
+      image_size: 1792
+      augment: true
+      score_threshold: 0.05
+      score_thresholds_by_kind: {pedestrian: 0.05, vehicle: 0.05, traffic_sign: 0.05, traffic_light: 0.05}
+      iou_threshold: 0.50
+      max_detections: 500
+      class_groups:
+        pedestrian: [pedestrian, rider]
+        vehicle: [bicycle, bus, car, motorcycle, train, truck]
+        traffic_sign: [traffic sign]
+        traffic_light: [traffic light]
+  fusion:
+    mode: wbf
+    iou_thr: 0.55
+    kind_iou_thr: {pedestrian: 0.50, traffic_light: 0.40, traffic_sign: 0.40, vehicle: 0.50}
+    weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  post_fusion_score_thresholds_by_kind:
+    pedestrian: 0.25
+    vehicle: 0.30
+    traffic_sign: 0.30
+    traffic_light: 0.25
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane:
+  enabled: true
+
+lane_smoothing:
+  enabled: true
+  window: 5
+
+tracking:
+  enabled: true
+  iou_threshold: 0.30
+  max_missed: 5
+  motion_prediction: true
+  centroid_distance_fraction: 0.5
+
+distance_estimation:
+  enabled: true
+
+visualization:
+  show_summary: true
+  label_style: compact
+  min_confidence: 0.30
+  avoid_label_overlap: true
+  distance_format: rounded

@@ -1,0 +1,20 @@
+# Fast demo profile: keep lane/sign/light heuristics, skip TorchVision objects.
+objects:
+  enabled: false
+
+lane:
+  hough_threshold: 45
+  min_line_length: 45
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true
+
