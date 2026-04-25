@@ -18,6 +18,14 @@ COLORS = {
     "default": (230, 230, 230),
 }
 
+# Per-state overrides for traffic_light boxes when state is classified.
+TRAFFIC_LIGHT_STATE_COLORS = {
+    "red": (60, 60, 230),
+    "yellow": (60, 220, 230),
+    "green": (60, 230, 90),
+    "off": (160, 160, 160),
+}
+
 
 def draw_perception(
     frame_bgr: np.ndarray,
@@ -88,6 +96,8 @@ def _draw_detection(
     drawn_label_rects: list[tuple[int, int, int, int]] | None = None,
 ) -> None:
     color = COLORS.get(detection.kind, COLORS["default"])
+    if detection.kind == "traffic_light" and detection.state in TRAFFIC_LIGHT_STATE_COLORS:
+        color = TRAFFIC_LIGHT_STATE_COLORS[detection.state]
     thickness = int(viz_config.get("box_thickness", 2))
     box = detection.box
     cv2.rectangle(vis, (box.x1, box.y1), (box.x2, box.y2), color, thickness)
@@ -98,12 +108,13 @@ def _draw_detection(
     track = f"#{detection.track_id} " if detection.track_id is not None else ""
     distance = _format_distance(detection.distance_m, viz_config)
     ground = _format_ground_position(detection.ground_position_m, viz_config)
+    state_suffix = f" [{detection.state}]" if detection.state else ""
     if style == "kind":
-        label = f"{track}{detection.kind}{distance}{ground}"
+        label = f"{track}{detection.kind}{state_suffix}{distance}{ground}"
     elif style == "compact":
-        label = f"{track}{detection.kind} {detection.confidence:.2f}{distance}{ground}"
+        label = f"{track}{detection.kind} {detection.confidence:.2f}{state_suffix}{distance}{ground}"
     else:  # full
-        label = f"{track}{detection.kind}:{detection.label} {detection.confidence:.2f}{distance}{ground}"
+        label = f"{track}{detection.kind}:{detection.label} {detection.confidence:.2f}{state_suffix}{distance}{ground}"
     _put_label(
         vis,
         label,
