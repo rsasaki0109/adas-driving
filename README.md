@@ -4,7 +4,7 @@
 
 ![demo](assets/demo_wbf7.gif)
 
-*(7-way WBF online config 出力。Pexels CC0 dashcam: [Driving In The City - mokhtar akel](https://www.pexels.com/video/driving-in-the-city-1578970/))*
+*(全部入りデモ出力: 7-way WBF 物体検出 + TwinLiteNet ONNX lane segmentation + ByteTrack 風 two-stage tracker + 単眼距離。Pexels CC0 dashcam: [Driving In The City - mokhtar akel](https://www.pexels.com/video/driving-in-the-city-1578970/))*
 
 ## 今できること
 
