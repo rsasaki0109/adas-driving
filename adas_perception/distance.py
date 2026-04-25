@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 
-from adas_perception.types import Detection
+from adas_perception.types import Box, Detection
 
 
 class MonocularDistanceEstimator:
@@ -26,7 +26,11 @@ class MonocularDistanceEstimator:
         self.horizontal_fov_degrees = float(config.get("horizontal_fov_degrees", 70.0))
         self.focal_length_px = config.get("focal_length_px")
         intrinsics = config.get("intrinsics") or {}
+        self.intrinsics_fx = intrinsics.get("fx")
         self.intrinsics_fy = intrinsics.get("fy")
+        self.intrinsics_cx = intrinsics.get("cx")
+        self.intrinsics_cy = intrinsics.get("cy")
+        self.camera_height_m = config.get("camera_height_m")
         self.min_box_height_px = int(config.get("min_box_height_px", 12))
         self.max_distance_m = float(config.get("max_distance_m", 120.0))
         self.object_heights_m = {
@@ -49,6 +53,12 @@ class MonocularDistanceEstimator:
             return detections
 
         focal_px = self._focal_length_px(width)
+        cx = float(self.intrinsics_cx) if self.intrinsics_cx is not None else 0.5 * width
+        cy = float(self.intrinsics_cy) if self.intrinsics_cy is not None else 0.5 * height
+        fx = float(self.intrinsics_fx) if self.intrinsics_fx is not None else focal_px
+        camera_height_m = (
+            float(self.camera_height_m) if self.camera_height_m is not None else None
+        )
         output: list[Detection] = []
         for detection in detections:
             object_height_m = self.object_heights_m.get(detection.kind)
@@ -61,8 +71,44 @@ class MonocularDistanceEstimator:
                 output.append(detection)
                 continue
             distance_m = min(distance_m, self.max_distance_m)
-            output.append(replace(detection, distance_m=distance_m))
+
+            ground_position = self._ground_position(
+                detection.box, fx=fx, fy=focal_px, cx=cx, cy=cy, camera_height_m=camera_height_m
+            )
+            output.append(
+                replace(detection, distance_m=distance_m, ground_position_m=ground_position)
+            )
         return output
+
+    def _ground_position(
+        self,
+        box: Box,
+        *,
+        fx: float,
+        fy: float,
+        cx: float,
+        cy: float,
+        camera_height_m: float | None,
+    ) -> tuple[float, float] | None:
+        """Project the bbox bottom-center to (X, Z) on the ground plane.
+
+        Assumes the camera is aligned with the road, with optical axis
+        roughly horizontal and the ground at depth Y = camera_height_m
+        below the camera. Returns None when camera_height_m is not provided
+        or when the bottom of the box is at/above the horizon.
+        """
+        if camera_height_m is None or camera_height_m <= 0:
+            return None
+        u = 0.5 * (float(box.x1) + float(box.x2))
+        v = float(box.y2)  # bottom of bbox = ground contact
+        delta_y = v - cy
+        if delta_y <= 0:
+            return None  # box bottom at or above horizon → no projection
+        z_m = float(camera_height_m) * fy / delta_y
+        if not math.isfinite(z_m) or z_m <= 0 or z_m > self.max_distance_m * 1.5:
+            return None
+        x_m = (u - cx) * z_m / fx
+        return (float(x_m), float(z_m))
 
     def _focal_length_px(self, image_width: int) -> float:
         if self.intrinsics_fy is not None:

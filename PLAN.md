@@ -1722,7 +1722,7 @@ outputs/bdd100k_yolo_img1024_kind_tuned_error_gallery_rainy_traffic_light/index.
 - 車線認識は物体検出と評価軸が違う
 - 物体検出改善と混ぜず、別トラックで進める
 
-### Phase 9: Tracking and distance (進行中 — motion prediction + centroid fallback 実装済み)
+### Phase 9: Tracking and distance (進行中 — motion + centroid + intrinsics + ground projection 実装済み)
 
 Tracker upgrade の A/B 検証 (test_video.mp4 50 frame、2-way WBF + tracking 有効):
 

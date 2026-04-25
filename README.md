@@ -335,7 +335,7 @@ python scripts/evaluate_bdd100k.py \
 - `traffic_lights`: HSV色範囲と赤/黄/緑の信号候補フィルタ
 - `lane_smoothing`: 動画向けの車線平滑化
 - `tracking`: 車両・歩行者向けのトラッキング (IoU + オプションの線形運動予測 + 重心距離fallback)
-- `distance_estimation`: bbox 高さと仮定物体高さによる粗い距離推定。`intrinsics.fy` (vertical focal length [px]) を指定すると校正値ベースで推定、`focal_length_px` の直接指定もできます。これらが無いときは `horizontal_fov_degrees` (default 70°) から fx を計算する fallback。優先順は `intrinsics.fy > focal_length_px > horizontal_fov_degrees`
+- `distance_estimation`: bbox 高さと仮定物体高さによる粗い距離推定。`intrinsics.fy` (vertical focal length [px]) を指定すると校正値ベースで推定、`focal_length_px` の直接指定もできます。これらが無いときは `horizontal_fov_degrees` (default 70°) から fx を計算する fallback。優先順は `intrinsics.fy > focal_length_px > horizontal_fov_degrees`。`intrinsics.fx`/`cx`/`cy` と `camera_height_m` をすべて指定すると、bbox bottom-center を地面に投影して **(X 横方向, Z 前方距離) [m]** を `Detection.ground_position_m` に格納します (JSON 出力にも `ground_position_m` フィールドが追加されます)。`visualization.show_ground_position: true` でラベル末尾に `[x=±0.7,z=14.0m]` 形式で描画されます
 - `visualization`: 描画の太さ、透明度、サマリー表示、kind filter、ラベル style、最小 confidence
 
 追加設定はdefaultへの上書きとして読み込まれます。
