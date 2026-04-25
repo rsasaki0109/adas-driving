@@ -135,6 +135,9 @@ tracking:
   max_missed: 5
   motion_prediction: true
   centroid_distance_fraction: 0.5
+  two_stage: true
+  high_score_threshold: 0.50
+  low_score_threshold: 0.10
 
 distance_estimation:
   enabled: true
