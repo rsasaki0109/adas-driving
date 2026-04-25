@@ -187,7 +187,7 @@ class TorchVisionObjectDetector:
                     source="torchvision",
                 )
             )
-            if len(detections) >= max_detections:
+            if len(detections) >= self.max_detections:
                 break
         return detections
 
