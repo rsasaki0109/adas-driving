@@ -15,11 +15,15 @@ Required config:
   lane.segmentation.input_size: [H, W] expected by the model (e.g. [288, 800])
 
 Optional config (defaults shown):
+  lane.segmentation.output_name: ""      # ONNX output name to read. Empty
+                                          # picks the first output. Useful for
+                                          # multi-head models like TwinLiteNet
+                                          # that emit drivable_area + lane_line.
   lane.segmentation.lane_channel: -1     # -1 means binary mask; >= 0 picks a
                                           # specific output channel for multi-class
-                                          # segmentation (lane vs background).
-  lane.segmentation.lane_threshold: 0.5  # sigmoid/probability threshold to
-                                          # binarize the mask.
+                                          # segmentation (e.g. 1 for the lane
+                                          # class in [bg, lane] logits).
+  lane.segmentation.lane_threshold: 0.5  # probability threshold to binarize.
   lane.segmentation.min_blob_pixels: 200 # drop tiny connected components.
   lane.segmentation.polyline_samples: 20 # samples per fitted polyline.
   lane.segmentation.providers: ["CUDAExecutionProvider", "CPUExecutionProvider"]
@@ -59,6 +63,7 @@ class LaneSegmentationDetector:
             raise ValueError("lane.segmentation.input_size must be [H, W]")
         self.input_h, self.input_w = int(input_size[0]), int(input_size[1])
 
+        self.output_name = str(seg_cfg.get("output_name", "") or "")
         self.lane_channel = int(seg_cfg.get("lane_channel", -1))
         self.lane_threshold = float(seg_cfg.get("lane_threshold", 0.5))
         self.min_blob_pixels = int(seg_cfg.get("min_blob_pixels", 200))
@@ -86,6 +91,15 @@ class LaneSegmentationDetector:
 
         self._session = ort.InferenceSession(str(self.model_path), providers=providers)
         self._input_name = self._session.get_inputs()[0].name
+        output_names = [out.name for out in self._session.get_outputs()]
+        if self.output_name:
+            if self.output_name not in output_names:
+                raise ValueError(
+                    f"lane.segmentation.output_name '{self.output_name}' not in model outputs {output_names}"
+                )
+            self._output_index = output_names.index(self.output_name)
+        else:
+            self._output_index = 0
 
     # Mirror LaneDetector.detect() signature so the pipeline can swap them.
     def detect(self, frame_bgr: np.ndarray) -> LaneResult:
@@ -99,7 +113,7 @@ class LaneSegmentationDetector:
         except Exception:
             return LaneResult()
 
-        mask = self._extract_lane_mask(outputs[0])  # (input_h, input_w) float in [0,1]
+        mask = self._extract_lane_mask(outputs[self._output_index])  # (input_h, input_w) float in [0,1]
         if mask is None or mask.size == 0:
             return LaneResult()
         mask_resized = cv2.resize(mask, (width, height), interpolation=cv2.INTER_LINEAR)
@@ -124,21 +138,19 @@ class LaneSegmentationDetector:
             return None
         # Handle common shapes:
         # (N, 1, H, W) sigmoid map
-        # (N, C, H, W) class logits → take softmax channel `lane_channel`
+        # (N, C, H, W) class logits → softmax across C, take `lane_channel`
         # (N, H, W) raw mask
         a = np.asarray(output)
         if a.ndim == 4 and a.shape[1] == 1:
-            mask = a[0, 0]
+            mask = a[0, 0].astype(np.float32)
         elif a.ndim == 4:
             channel = self.lane_channel if 0 <= self.lane_channel < a.shape[1] else 1
-            channel_data = a[0, channel]
-            channel_data = _sigmoid(channel_data) if channel_data.dtype != np.uint8 else channel_data
-            mask = channel_data
+            logits = a[0].astype(np.float32)  # (C, H, W)
+            mask = _softmax_along_axis(logits, axis=0)[channel]
         elif a.ndim == 3:
-            mask = a[0]
+            mask = a[0].astype(np.float32)
         else:
             return None
-        mask = mask.astype(np.float32)
         if mask.max() > 1.5:
             mask = _sigmoid(mask)
         return np.clip(mask, 0.0, 1.0)
@@ -232,3 +244,9 @@ class LaneSegmentationDetector:
 
 def _sigmoid(x: np.ndarray) -> np.ndarray:
     return 1.0 / (1.0 + np.exp(-x))
+
+
+def _softmax_along_axis(x: np.ndarray, axis: int) -> np.ndarray:
+    x_shifted = x - np.max(x, axis=axis, keepdims=True)
+    e = np.exp(x_shifted)
+    return e / np.sum(e, axis=axis, keepdims=True)

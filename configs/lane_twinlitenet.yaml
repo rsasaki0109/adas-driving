@@ -1,0 +1,26 @@
+# TwinLiteNet (BDD100K-trained, MIT, ~1.8 MB) lane segmentation backend.
+# Download once with:
+#   mkdir -p outputs/models
+#   wget -O outputs/models/twinlitenet_lane.onnx \
+#     https://raw.githubusercontent.com/harrylal/TwinLiteNet-onnxruntime/main/models/best.onnx
+# Source: https://github.com/chequanghuy/TwinLiteNet (MIT)
+#
+# This config swaps the lane backend only; layer it on top of any base
+# config that already configures `objects` / `signs` / etc. by passing
+# both via `apply_runtime_overrides` or by inlining the keys you need.
+lane:
+  enabled: true
+  backend: segmentation
+  segmentation:
+    model_path: outputs/models/twinlitenet_lane.onnx
+    input_size: [360, 640]
+    output_name: ll              # "ll" = lane line head, "da" = drivable area
+    lane_channel: 1              # softmax over [bg, lane]; lane = channel 1
+    lane_threshold: 0.5
+    min_blob_pixels: 200
+    polyline_samples: 20
+    input_layout: NCHW
+    normalize:
+      mean: [0.0, 0.0, 0.0]
+      std: [1.0, 1.0, 1.0]
+      scale: 255.0               # TwinLiteNet uses simple x/255 normalization

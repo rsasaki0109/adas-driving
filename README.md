@@ -172,6 +172,20 @@ CPUで明示実行:
 python scripts/demo_image.py --input path/to/road.jpg --device cpu
 ```
 
+学習済み lane segmentation モデル (TwinLiteNet, BDD100K-trained, MIT, ~1.8 MB) を使う場合:
+
+```bash
+mkdir -p outputs/models
+wget -O outputs/models/twinlitenet_lane.onnx \
+  https://raw.githubusercontent.com/harrylal/TwinLiteNet-onnxruntime/main/models/best.onnx
+.venv/bin/pip install onnxruntime          # GPU を使うなら onnxruntime-gpu
+python scripts/demo_image.py --input path/to/road.jpg \
+  --config configs/lane_twinlitenet.yaml --no-objects \
+  --output outputs/road_lane_seg.jpg
+```
+
+`configs/lane_twinlitenet.yaml` は lane backend だけ segmentation に差し替える小さい preset です。物体検出と組み合わせるときはベース config と一緒に指定してください。
+
 ブラウザ可視化 (gradioベース、headless / Jetson 想定):
 
 ```bash
@@ -329,7 +343,7 @@ python scripts/evaluate_bdd100k.py \
 
 デフォルト設定は [configs/default.yaml](configs/default.yaml) にあります。
 
-- `lane`: Canny/Hough/ROI などの車線検出パラメータに加え、`color_mask.enabled: true` で HSV ベースの白/黄ライン抽出を Canny edges に AND し、影や縁石の誤検出を抑制します。candidates の slope は MAD ベースの外れ値除去で robust にします。`polynomial_fit.enabled: true` を指定すると、各 side の Hough endpoints から (x = a y² + b y + c) の 2 次多項式を fit し、`polyline_samples` 点に sampling した polyline で curve を表現します。LaneLine の polyline が埋まると visualization は polylines で描画し、走行 polygon もこの polyline ベースで構成されます。`lane.backend: segmentation` を指定すると ONNX 推論ベースの `LaneSegmentationDetector` に切り替わり、TuSimple/CULane などで学習した binary lane mask モデルを使えます (要 `onnxruntime`)。必要 config: `lane.segmentation.model_path` (.onnx) と `lane.segmentation.input_size: [H, W]`。出力 mask を connected components 分割 → polyfit → 左右割当の順で `LaneResult` を生成します。CV backend と同じ `LaneResult` 形式なので visualization / lane_smoothing 等は変更不要
+- `lane`: Canny/Hough/ROI などの車線検出パラメータに加え、`color_mask.enabled: true` で HSV ベースの白/黄ライン抽出を Canny edges に AND し、影や縁石の誤検出を抑制します。candidates の slope は MAD ベースの外れ値除去で robust にします。`polynomial_fit.enabled: true` を指定すると、各 side の Hough endpoints から (x = a y² + b y + c) の 2 次多項式を fit し、`polyline_samples` 点に sampling した polyline で curve を表現します。LaneLine の polyline が埋まると visualization は polylines で描画し、走行 polygon もこの polyline ベースで構成されます。`lane.backend: segmentation` を指定すると ONNX 推論ベースの `LaneSegmentationDetector` に切り替わり、TwinLiteNet / YOLOP / TuSimple / CULane などで学習した lane mask モデルを使えます (要 `onnxruntime`)。必要 config: `lane.segmentation.model_path` (.onnx) と `lane.segmentation.input_size: [H, W]`。`output_name` で multi-head モデルから lane head を選び、`lane_channel` で 2-class softmax から lane クラスを取り出せます。出力 mask を connected components 分割 → polyfit → 左右割当の順で `LaneResult` を生成します。CV backend と同じ `LaneResult` 形式なので visualization / lane_smoothing 等は変更不要
 - `objects`: 検出バックエンド、モデル、重み、デバイス、スコアしきい値、対象クラス
 - `signs`: HSV色範囲と標識候補の面積/形状フィルタ
 - `traffic_lights`: HSV色範囲と赤/黄/緑の信号候補フィルタ
