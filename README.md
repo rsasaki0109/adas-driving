@@ -2,6 +2,10 @@
 
 `adas-perception` は、単眼カメラ画像/動画から車線・車両・歩行者・標識・信号候補を検出して可視化する、デモ重視のPython製ADAS認識OSSです。
 
+![demo](assets/demo_wbf7.gif)
+
+*(7-way WBF online config 出力。Pexels CC0 dashcam: [Driving In The City - mokhtar akel](https://www.pexels.com/video/driving-in-the-city-1578970/))*
+
 ## 今できること
 
 - OpenCVによる車線候補の検出と走行レーン領域の描画
