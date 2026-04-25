@@ -4,7 +4,7 @@
 
 ![demo](assets/demo_wbf7.gif)
 
-*(全部入りデモ出力: 7-way WBF 物体検出 + TwinLiteNet ONNX lane segmentation + ByteTrack 風 two-stage tracker + 単眼距離 + traffic_light state 分類 (red/yellow/green/off で box 色変化)。Pexels CC0 dashcam: [Driving In The City - mokhtar akel](https://www.pexels.com/video/driving-in-the-city-1578970/))*
+*(全部入りデモ出力: 7-way WBF 物体検出 + TwinLiteNet ONNX lane segmentation + ByteTrack 風 two-stage tracker + 単眼距離 + traffic_light state 分類 (red/yellow/green/off で box 色変化)。Pexels CC0 dashcam: [Dash Cam View Of The Road](https://www.pexels.com/video/dash-cam-view-of-the-road-5921059/))*
 
 ## 今できること
 
