@@ -1,24 +1,134 @@
 # PLAN
 
-Last updated: 2026-04-25 (v0.x milestone wrap-up: WBF ceiling 0.6763 + Phase 7 demo improvements + headless web demo. Jetson edge deploy moved to future work)
+Last updated: 2026-04-26 (Codex 引き継ぎ版。Phase 7-9 + lane segmentation + traffic_light state + Stockholm demo asset まで完了)
 
 `adas-perception` は、単眼カメラ画像/動画から車線、車両、歩行者、標識、信号候補を検出して可視化する、デモ重視のPython製ADAS認識OSSである。これは運転判断や車両制御のためのスタックではなく、公開データ上で再現可能に改善していくカメラ認識プロジェクトとして進める。
 
 この文書は、現状の実装、評価済み実験、採用判断、次にやる作業を一か所にまとめるための作業計画である。READMEは利用者向け、ROADMAPは大枠の方向性、このPLANは開発中の意思決定と実行順を残す場所として使う。
 
-## Claude Handoff
+## Codex Handoff
 
-このセクションは、Claude へそのまま引き継ぐための短い状況整理である。細部は後ろの各Phaseにあるが、まずここを見れば今の到達点と次の一手が分かるようにする。
+このセクションは Codex (次に作業する AI / 開発者) 向けの引き継ぎサマリ。
+細部は後ろの各 Phase / 実験記録にあるが、まずここを見れば今の到達点と
+次の一手がわかる。詳しい歴史的判断は 「これまでの主要実験」 を参照。
 
-### 現在地
+### 一目でわかる現状
+
+| 項目 | 値 |
+|---|---|
+| accuracy ceiling (online single-config) | macro F1 **0.6763** (7-way WBF online、`configs/bdd100k_yolo_wbf7_demo.yaml`) |
+| accuracy ceiling (offline cache batch) | macro F1 0.6753 |
+| single-config online (中量級) | macro F1 0.6389 (TTA tuned + tiny override) |
+| 高速 demo baseline | macro F1 0.6355 (no-TTA、`..._tuned_split_img1024_kind_tuned.yaml`) |
+| eval split | BDD100K val odd-index 5,000 frames (frame_stride=2, frame_offset=1) |
+| 主要モデル | `outputs/models/adas_yolov8n_bdd100k.pt` (BDD100K で fine-tune した YOLOv8n) |
+| lane | OpenCV (Hough+poly) もしくは TwinLiteNet ONNX (BDD100K-trained, MIT, 1.8 MB) |
+| tracker | IoU + linear motion + centroid fallback + ByteTrack two-stage |
+| distance | bbox-height projection + ground (X, Z) projection (要 intrinsics + camera_height) |
+| traffic_light state | HSV ベース red/yellow/green/off 分類 (no extra model) |
+| online demo | `scripts/demo_image.py` / `scripts/demo_video.py` / `scripts/web_demo.py` |
+| README hero | `assets/demo_wbf7.gif` (Stockholm Pexels CC0、640x360 @ 10fps、5 MB) |
+
+### 主要ブロッカー (両方とも user-action 待ち)
+
+1. **官公 BDD100K train split 未配置** (~70k 画像 / ~7GB)。
+   配置すれば `bash scripts/run_bdd100k_official_train.sh` で export → 学習 →
+   eval → sweep → compare までワンコマンド。これが accuracy 続伸の唯一の道。
+2. **Jetson 実機未入手**。エッジデプロイ (TensorRT/INT8 / Web demo on Jetson)
+   は ROS 不要 + 数分インストールの軽量さで Autoware/OpenPilot と差別化できる
+   が、実機 FPS 計測が無いと裏取りできない。
+
+### Codex が次にやるべきこと (優先順)
+
+A) **README polish (~15min)**: 冒頭に TL;DR / one-liner install / hero GIF +
+   feature bullet を上げる。Autoware/OpenPilot との位置付け表 (PLAN にすでに
+   ある) を README に転記。badges (license / Python / OS) を追加。
+
+B) **WBF accuracy chart (~15min)**: ladder 0.6355 → 0.6763 を bar/line で
+   render、`assets/wbf_ladder.png` に保存して README に貼る。「inference-side
+   のみで +0.04」のインパクトが視覚化される。
+
+C) **YOLOP 統合比較 (~20min)**: 36 MB MIT で BDD100K-trained。
+   `https://raw.githubusercontent.com/Kazuhito00/YOLOP-ONNX-Video-Inference-Sample/main/weights/yolop-640-640.onnx`
+   から落として `LaneSegmentationDetector` で lane head を読む。
+   `evaluate_lane.py` で TwinLiteNet vs YOLOP を comparative stats。
+   YOLOP は object detection も内蔵なので 7-way WBF との比較もできる。
+
+D) **CI / pytest (~30min)**: 既存の smoke test (現状はワンライナー散在) を
+   `tests/` に整理し、`pytest -k "not slow"` で軽量テストを通す。GitHub
+   Actions で PR ごとに走らせる。focus: tracker (unit), distance projection
+   (unit), traffic_light state (unit)、lane detector smoke (1 image)。
+
+E) **README hero MP4 化** (~10min): GIF 5MB を MP4 ~2MB に置換すると GitHub
+   での再生品質が上がる。`<video>` tag は markdown で strip されるので、
+   PR/Issue に attach した URL を使う方法がある。または HTML 描画される
+   `[![demo](thumbnail.png)](raw_mp4_url)` 風に。
+
+F) **官公 train split が user 側で配置されたら**: `bash
+   scripts/run_bdd100k_official_train.sh` をそのまま走らせる。10 epoch で
+   約 4 時間 (RTX 4070)。validation mirror 上の頭打ち (-0.005 macro from
+   plain retrain) を解消できる可能性がある。
+
+G) **Jetson 実機が手に入ったら**: ONNX export → TensorRT engine (FP16/INT8)、
+   軽量 config (640px no-TTA preset)、`scripts/web_demo.py` を実機で起動して
+   LAN ブラウザから検証。FPS 実測が取れたら README へ反映。
+
+H) **Phase 8 残り (defer 可)**: BDD100K lane labels (`lane_train.json` /
+   `lane_val.json`、別 zip) を入れて `scripts/evaluate_lane.py --labels` で
+   IoU/F1 比較。CV vs TwinLiteNet vs YOLOP の定量比較が完成する。
+
+### このセッションで入った主な変更 (2026-04-25 〜 26)
+
+- `objects.fusion.mode=wbf` (online WBF integration in `pipeline.py`)
+- `LaneDetector` の polynomial_fit + HSV color_mask + MAD outlier rejection
+- `LaneSegmentationDetector` (ONNX、TwinLiteNet 対応 + softmax 2-channel)
+- `LaneSmoother` の polyline 対応 (前は 2-point のみ平滑化)
+- `SimpleTracker` の motion_prediction + centroid fallback + ByteTrack 風
+  two-stage matching
+- `MonocularDistanceEstimator` の intrinsics override (fx, fy, cx, cy) +
+  ground (X, Z) projection
+- `TrafficLightStateClassifier` (HSV ベース、red/yellow/green/off)
+- `visualization.py` 拡張: `include_kinds` / `exclude_kinds` /
+  `min_confidence` / `label_style` / `avoid_label_overlap` /
+  `distance_format` / `show_ground_position`、traffic_light 状態色分け
+- `scripts/web_demo.py` (gradio headless web demo)
+- `scripts/evaluate_lane.py` (lane detector 比較)
+- `scripts/run_bdd100k_official_train.sh` (官公 train pipeline)
+- `scripts/fuse_bdd100k_predictions.py` (offline WBF cache fusion)
+- `configs/bdd100k_yolo_wbf7_demo.yaml` (全部入り demo)
+- README hero GIF を 3 度更新 (no-TTA → WBF only → all-in-one → Stockholm clip)
+
+### 引き継ぎ時の注意
+
+- このリポは git push 済み (`origin git@github.com:rsasaki0109/adas-perception.git`、
+  branch `main`)。**まだ public 化していない** (visibility 変更は user の明示
+  許可が必要、harness で gh repo edit が block される設定)。
+- `data/` (train data 含む) と `outputs/` (中間生成物 1.6GB) は gitignore。
+- `*.pt`, `*.engine`, `*.onnx` も gitignore。`assets/demo_wbf7.gif` のみ
+  tracked。
+- Python venv は `.venv/`。`.venv/bin/python ...` で run、`yolo` CLI は無い
+  ので Python API 経由で学習。
+- `configs/` の YAML は dict ベース。`apply_runtime_overrides` で device 等
+  を上書きできる。新 backend (lane_seg / WBF / state classifier) はすべて
+  default off にして backward compatibility を保ってある。
+- 現状の lane segmentation は `outputs/models/twinlitenet_lane.onnx` を
+  ローカルダウンロード前提 (1.8 MB MIT、download URL は README と
+  `configs/lane_twinlitenet.yaml` のコメントに記載)。
+
+### 旧 Claude Handoff (履歴) 以下
+
+(以前の Claude セッションが書いた状況メモ。概ね Codex Handoff で集約済みだが、
+WBF ladder の数値推移とエラー分析の細部はここに残す。)
+
+#### 現在地
 
 - 最終 accuracy ceiling: 7 source (no-TTA + TTA@1024 + tl-only TTA + TTA@960/1280/1536/1792)
   を WBF で融合、**per-kind iou_thr (ped=0.50, tl=0.40, ts=0.40, v=0.50)** + per-kind threshold で
   macro F1 = 0.6753 (offline) / **0.6763 (online pipeline)** に到達。全 4 クラスが
   previous best 0.6355 を大幅に超え、pedestrian +0.053、traffic_light +0.049、
   traffic_sign +0.035 (online)、vehicle +0.027。
-  imgsz=2048 や class-balanced/ped-only/yolo11n retrain を 8th source に加えても改善せず、
-  retrain diversity も scale diversity も 7-way で飽和している。
+  imgsz=2048 や class-balanced/ped-only/yolo11n/CLAHE retrain/preprocess を 8th source に
+  加えても改善せず、retrain diversity も scale diversity も 7-way で飽和している。
   online pipeline 版は single-config で実行可能 (~3.4 FPS on RTX 4070)。
 
 ### Online WBF の conditional evaluation (odd 5000 で --group-by weather timeofday scene)
