@@ -16,6 +16,7 @@ from adas_perception.detectors import (
 from adas_perception.distance import MonocularDistanceEstimator
 from adas_perception.lane_smoothing import LaneSmoother
 from adas_perception.tracking import SimpleTracker
+from adas_perception.traffic_light_state import TrafficLightStateClassifier
 from adas_perception.types import Box, Detection, LaneResult, PerceptionResult
 
 
@@ -46,6 +47,9 @@ class ADASPerceptionPipeline:
         self.lane_smoother = LaneSmoother(config.get("lane_smoothing", {}))
         self.tracker = SimpleTracker(config.get("tracking", {}))
         self.distance_estimator = MonocularDistanceEstimator(config.get("distance_estimation", {}))
+        self.traffic_light_state_classifier = TrafficLightStateClassifier(
+            config.get("traffic_light_state", {})
+        )
 
     def reset(self) -> None:
         self.lane_smoother.reset()
@@ -87,6 +91,7 @@ class ADASPerceptionPipeline:
             detections = _nms_by_kind(detections, iou_threshold=nms_iou)
         detections = self.tracker.update(detections)
         detections = self.distance_estimator.estimate(detections, frame_bgr)
+        detections = self.traffic_light_state_classifier.classify(frame_bgr, detections)
         return PerceptionResult(lanes=lanes, detections=detections)
 
 

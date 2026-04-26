@@ -108,6 +108,8 @@ def detection_to_dict(detection: Detection) -> dict[str, Any]:
     if detection.ground_position_m is not None:
         x_m, z_m = detection.ground_position_m
         payload["ground_position_m"] = {"x": round(float(x_m), 3), "z": round(float(z_m), 3)}
+    if detection.state is not None:
+        payload["state"] = detection.state
     return payload
 
 

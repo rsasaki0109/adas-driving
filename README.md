@@ -4,7 +4,7 @@
 
 ![demo](assets/demo_wbf7.gif)
 
-*(全部入りデモ出力: 7-way WBF 物体検出 + TwinLiteNet ONNX lane segmentation + ByteTrack 風 two-stage tracker + 単眼距離。Pexels CC0 dashcam: [Driving In The City - mokhtar akel](https://www.pexels.com/video/driving-in-the-city-1578970/))*
+*(全部入りデモ出力: 7-way WBF 物体検出 + TwinLiteNet ONNX lane segmentation + ByteTrack 風 two-stage tracker + 単眼距離 + traffic_light state 分類 (red/yellow/green/off で box 色変化)。Pexels CC0 dashcam: [Driving In The City - mokhtar akel](https://www.pexels.com/video/driving-in-the-city-1578970/))*
 
 ## 今できること
 
@@ -36,6 +36,8 @@
 - BDD100K小物体をfull-frame文脈へ戻すtrain専用copy-paste export
 - 保存済みBDD100K予測JSONを使った高速なscore threshold再評価
 - 保存済みBDD100K予測JSONをWeighted Box Fusionで融合するoffline accuracy ceiling
+- traffic_light の HSV ベース state 分類 (red / yellow / green / off)
+- BDD100K lane labels (任意) で CV vs ONNX セグメンテーション比較する `evaluate_lane.py`
 - ブラウザだけで操作するheadless friendly web demo (gradio、Jetson想定)
 - UltralyticsバックエンドでのTest-Time Augmentation (水平反転+multi-scale)
 - BDD100Kでfine-tuneした単一YOLOによる車両・歩行者・標識・信号候補検出
@@ -114,6 +116,7 @@ adas-perception/
 │   ├── evaluate_json.py       # JSON出力の簡易集計
 │   ├── export_bdd100k_yolo.py # BDD100KからYOLO学習形式へexport
 │   ├── fuse_bdd100k_predictions.py # 複数予測JSONをWeighted Box Fusionで融合
+│   ├── evaluate_lane.py       # CV / ONNXセグメンテーション車線検出の比較
 │   ├── web_demo.py            # ブラウザ可視化 (gradio、Jetson/headless 向け)
 │   ├── prepare_bdd100k.py     # 公式BDD100K zipの展開/検証
 │   ├── run_bdd100k_official_train.sh # 公式train split一括学習パイプライン

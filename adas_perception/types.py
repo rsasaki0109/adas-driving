@@ -44,6 +44,7 @@ class Detection:
     track_id: int | None = None
     distance_m: float | None = None
     ground_position_m: tuple[float, float] | None = None  # (lateral X, forward Z) on ground plane in camera coords
+    state: str | None = None  # e.g. "red" / "yellow" / "green" / "off" for traffic_light
 
 
 @dataclass(frozen=True)
