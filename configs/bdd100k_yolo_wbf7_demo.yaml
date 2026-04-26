@@ -117,6 +117,11 @@ traffic_lights:
 
 lane:
   enabled: true
+  # Pluggable backend. The CV path stays available as a fallback when no
+  # ONNX model is on disk; the demo uses TwinLiteNet (BDD100K, MIT, ~1.8 MB).
+  # See configs/lane_twinlitenet.yaml for the standalone preset and the
+  # README for the wget command.
+  backend: segmentation
   color_mask:
     enabled: true
     dilate_iterations: 2
@@ -124,6 +129,19 @@ lane:
     enabled: true
     min_points: 6
     polyline_samples: 12
+  segmentation:
+    model_path: outputs/models/twinlitenet_lane.onnx
+    input_size: [360, 640]
+    output_name: ll
+    lane_channel: 1
+    lane_threshold: 0.5
+    min_blob_pixels: 200
+    polyline_samples: 20
+    input_layout: NCHW
+    normalize:
+      mean: [0.0, 0.0, 0.0]
+      std: [1.0, 1.0, 1.0]
+      scale: 255.0
 
 lane_smoothing:
   enabled: true
@@ -141,6 +159,17 @@ tracking:
 
 distance_estimation:
   enabled: true
+  # Approximate intrinsics + camera height for typical dashcam (1920x1080
+  # input): treats fx ≈ fy ≈ 1500 px, principal point at image center,
+  # camera 1.4 m above the road. Replace with your own calibration when
+  # available; without `camera_height_m` ground_position_m stays None and
+  # only `distance_m` (bbox-height projection) is populated.
+  intrinsics:
+    fx: 1500.0
+    fy: 1500.0
+    cx: 960.0
+    cy: 540.0
+  camera_height_m: 1.4
 
 visualization:
   show_summary: true
@@ -148,3 +177,6 @@ visualization:
   min_confidence: 0.30
   avoid_label_overlap: true
   distance_format: rounded
+  # Toggle ground (X, Z) [m] in the label tail. Off keeps the GIF clean;
+  # flip to true to inspect ground projections.
+  show_ground_position: false
