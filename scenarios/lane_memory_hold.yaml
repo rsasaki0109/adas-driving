@@ -1,0 +1,12 @@
+schema_version: planning_scenario.v0.1
+name: lane_memory_hold
+description: Lane dropout should fail-soft with held target path from SceneMemory.
+perception_json: tests/fixtures/planning/lane_dropout.json
+config: configs/planning/default.yaml
+checks:
+  - name: path_stays_valid
+    type: metric_gte
+    metric: target_path_valid_rate
+    min: 0.55
+  - name: valid_confidence
+    type: result_valid_all_frames

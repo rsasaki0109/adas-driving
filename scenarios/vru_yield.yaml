@@ -1,0 +1,16 @@
+schema_version: planning_scenario.v0.1
+name: vru_yield
+description: Pedestrian in lane corridor should trigger YIELD_VRU.
+perception_json: tests/fixtures/planning/vru_crossing.json
+config: configs/planning/default.yaml
+checks:
+  - name: yield_behavior
+    type: behavior_rate
+    behavior: YIELD_VRU
+    frame_indices: [0, 1, 2, 3, 4]
+    min_rate: 1.0
+  - name: yield_warning
+    type: warning_rate
+    code: YIELD_VRU
+    frame_indices: [0, 1, 2, 3, 4]
+    min_rate: 1.0

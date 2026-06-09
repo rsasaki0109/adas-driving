@@ -1,0 +1,25 @@
+# YOLOP (BDD100K-trained, MIT, ~36 MB) lane segmentation backend.
+# Download once with:
+#   mkdir -p outputs/models
+#   wget -O outputs/models/yolop-640-640.onnx \
+#     https://raw.githubusercontent.com/Kazuhito00/YOLOP-ONNX-Video-Inference-Sample/main/weights/yolop-640-640.onnx
+# Source: https://github.com/hustvl/YOLOP (MIT)
+#
+# YOLOP is multi-head (det + drivable area + lane line). This preset reads
+# only the `lane_line_seg` head via LaneSegmentationDetector.
+lane:
+  enabled: true
+  backend: segmentation
+  segmentation:
+    model_path: outputs/models/yolop-640-640.onnx
+    input_size: [640, 640]
+    output_name: lane_line_seg
+    lane_channel: 1              # softmax over [bg, lane]
+    lane_threshold: 0.5
+    min_blob_pixels: 200
+    polyline_samples: 20
+    input_layout: NCHW
+    normalize:
+      mean: [0.0, 0.0, 0.0]
+      std: [1.0, 1.0, 1.0]
+      scale: 255.0

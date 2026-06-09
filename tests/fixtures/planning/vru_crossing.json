@@ -1,0 +1,365 @@
+{
+  "schema_version": "0.1",
+  "video": {
+    "width": 640,
+    "height": 360,
+    "fps": 10.0
+  },
+  "frames": [
+    {
+      "frame_index": 0,
+      "timestamp_ms": 0.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                180,
+                350
+              ],
+              [
+                220,
+                180
+              ]
+            ],
+            "confidence": 0.8
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                460,
+                350
+              ],
+              [
+                420,
+                180
+              ]
+            ],
+            "confidence": 0.78
+          }
+        ],
+        "polygon": [
+          [
+            180,
+            350
+          ],
+          [
+            460,
+            350
+          ],
+          [
+            420,
+            180
+          ],
+          [
+            220,
+            180
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "pedestrian",
+          "label": "person",
+          "confidence": 0.82,
+          "track_id": 5,
+          "distance_m": 12.0,
+          "box": {
+            "x1": 305,
+            "y1": 210,
+            "x2": 335,
+            "y2": 280,
+            "width": 30,
+            "height": 70
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 1,
+      "timestamp_ms": 100.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                180,
+                350
+              ],
+              [
+                220,
+                180
+              ]
+            ],
+            "confidence": 0.8
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                460,
+                350
+              ],
+              [
+                420,
+                180
+              ]
+            ],
+            "confidence": 0.78
+          }
+        ],
+        "polygon": [
+          [
+            180,
+            350
+          ],
+          [
+            460,
+            350
+          ],
+          [
+            420,
+            180
+          ],
+          [
+            220,
+            180
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "pedestrian",
+          "label": "person",
+          "confidence": 0.82,
+          "track_id": 5,
+          "distance_m": 12.0,
+          "box": {
+            "x1": 305,
+            "y1": 210,
+            "x2": 335,
+            "y2": 280,
+            "width": 30,
+            "height": 70
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 2,
+      "timestamp_ms": 200.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                180,
+                350
+              ],
+              [
+                220,
+                180
+              ]
+            ],
+            "confidence": 0.8
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                460,
+                350
+              ],
+              [
+                420,
+                180
+              ]
+            ],
+            "confidence": 0.78
+          }
+        ],
+        "polygon": [
+          [
+            180,
+            350
+          ],
+          [
+            460,
+            350
+          ],
+          [
+            420,
+            180
+          ],
+          [
+            220,
+            180
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "pedestrian",
+          "label": "person",
+          "confidence": 0.82,
+          "track_id": 5,
+          "distance_m": 12.0,
+          "box": {
+            "x1": 305,
+            "y1": 210,
+            "x2": 335,
+            "y2": 280,
+            "width": 30,
+            "height": 70
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 3,
+      "timestamp_ms": 300.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                180,
+                350
+              ],
+              [
+                220,
+                180
+              ]
+            ],
+            "confidence": 0.8
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                460,
+                350
+              ],
+              [
+                420,
+                180
+              ]
+            ],
+            "confidence": 0.78
+          }
+        ],
+        "polygon": [
+          [
+            180,
+            350
+          ],
+          [
+            460,
+            350
+          ],
+          [
+            420,
+            180
+          ],
+          [
+            220,
+            180
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "pedestrian",
+          "label": "person",
+          "confidence": 0.82,
+          "track_id": 5,
+          "distance_m": 12.0,
+          "box": {
+            "x1": 305,
+            "y1": 210,
+            "x2": 335,
+            "y2": 280,
+            "width": 30,
+            "height": 70
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 4,
+      "timestamp_ms": 400.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                180,
+                350
+              ],
+              [
+                220,
+                180
+              ]
+            ],
+            "confidence": 0.8
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                460,
+                350
+              ],
+              [
+                420,
+                180
+              ]
+            ],
+            "confidence": 0.78
+          }
+        ],
+        "polygon": [
+          [
+            180,
+            350
+          ],
+          [
+            460,
+            350
+          ],
+          [
+            420,
+            180
+          ],
+          [
+            220,
+            180
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "pedestrian",
+          "label": "person",
+          "confidence": 0.82,
+          "track_id": 5,
+          "distance_m": 12.0,
+          "box": {
+            "x1": 305,
+            "y1": 210,
+            "x2": 335,
+            "y2": 280,
+            "width": 30,
+            "height": 70
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+schema_version: planning_scenario.v0.1
+name: config_compare_conservative
+description: Conservative config should hold lane path at least as well during dropout.
+perception_json: tests/fixtures/planning/lane_dropout.json
+config: configs/planning/default.yaml
+configs:
+  default: configs/planning/default.yaml
+  conservative: configs/planning/conservative.yaml
+checks:
+  - name: conservative_path_valid_rate
+    type: config_metric_gte
+    config: conservative
+    than_config: default
+    metric: target_path_valid_rate

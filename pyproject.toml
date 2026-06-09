@@ -24,6 +24,9 @@ bdd100k = [
 yolo = [
   "ultralytics>=8.3",
 ]
+dev = [
+  "pytest>=8.0",
+]
 
 [tool.setuptools.packages.find]
-include = ["adas_perception*"]
+include = ["adas_perception*", "adas_planning*", "adas_driving*"]
