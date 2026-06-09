@@ -292,12 +292,16 @@ J) **Planning Phase 2 + inference-side (~2026-06-10)**: ✅ baseline planner com
    benchmark adapter (`scripts/export_planning_benchmark.py`, CSV/MD/JSON export,
    `scripts/export_driving_replay.py` → `driving_replay.v0.1`)。
 
-**Post-NMS bootstrap sweep (2026-06-10, yolov8n.pt, odd val 200 frames):**
+**Post-NMS production sweep (2026-06-10, odd 5,000 report split):**
 
-- raw cache-low macro F1 ≈ **0.208** (`outputs/bdd100k_yolo_bootstrap_cache_low_odd_report.json`)
-- best post-NMS combo macro F1 ≈ **0.217** (`outputs/postprocess_sweep_bootstrap/summary.json`)
-- 主な改善: vehicle F1 **0.556 → 0.592**（FP 1573 → 170 @ score 0.20 + NMS 0.45/0.35）
-- 注意: finetuned weight 未使用のため絶対値は参考。finetuned cache 上で再 sweep するのが本番。
+- script: `bash scripts/run_postprocess_sweep_production.sh`
+- weight: proxy bootstrap (`even 1ep` from `yolov8n.pt`; canonical checkpoint 未配置時)
+- cache: `outputs/bdd100k_yolo_current_best_cache_low_odd_5000_predictions.json`
+- kind thresholds only (no post-NMS): macro F1 **0.4781**
+- best post-NMS combo: macro F1 **0.4795** (+0.0014)
+- best settings: score 0.20 + NMS default 0.45 + tl/ts 0.35/0.40 + ped 0.45
+- compare: `outputs/postprocess_sweep_production/compare.md`
+- 本番比較: 正規 `adas_yolov8n_bdd100k.pt` 配置後に `AUTO_TRAIN=0` で再実行
 
 ### このセッションで入った主な変更 (2026-04-25 〜 26)
 
