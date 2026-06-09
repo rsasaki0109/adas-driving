@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PlanningInput v0.1",
+  "type": "object",
+  "required": ["frame_id", "timestamp_s", "image_width", "image_height"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "planning_input.v0.1" },
+    "frame_id": { "type": "integer", "minimum": 0 },
+    "timestamp_s": { "type": "number", "minimum": 0 },
+    "coordinate_frame": { "type": "string" },
+    "image_width": { "type": "integer", "minimum": 1 },
+    "image_height": { "type": "integer", "minimum": 1 },
+    "ego_speed_mps": { "type": ["number", "null"] },
+    "lanes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["side", "points_px"],
+        "properties": {
+          "side": { "type": "string" },
+          "points_px": {
+            "type": "array",
+            "items": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 }
+          },
+          "confidence": { "type": "number" }
+        }
+      }
+    },
+    "polygon_px": {
+      "type": "array",
+      "items": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 }
+    },
+    "detections": { "type": "array" }
+  }
+}

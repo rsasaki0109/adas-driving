@@ -1,10 +1,224 @@
 # PLAN
 
-Last updated: 2026-04-26 (Codex 引き継ぎ版。Phase 7-9 + lane segmentation + traffic_light state + Stockholm demo asset まで完了)
+Last updated: 2026-06-10 (Planning Phase 1 demo + scenarios)
 
-`adas-perception` は、単眼カメラ画像/動画から車線、車両、歩行者、標識、信号候補を検出して可視化する、デモ重視のPython製ADAS認識OSSである。これは運転判断や車両制御のためのスタックではなく、公開データ上で再現可能に改善していくカメラ認識プロジェクトとして進める。
+`adas-perception` は、単眼カメラ画像/動画から車線、車両、歩行者、標識、信号候補を検出して可視化する、デモ重視のPython製ADAS認識OSSである。現在の主軸は認識だが、次の pivot では「perception JSON から driving-relevant な判断を安定して再生・可視化・比較できる planning overlay / planning JSON」を追加する。これは車両制御や安全性能を主張するスタックではなく、公開データ上で再現可能に改善していく研究・デモ・教育向けプロジェクトとして進める。
 
 この文書は、現状の実装、評価済み実験、採用判断、次にやる作業を一か所にまとめるための作業計画である。READMEは利用者向け、ROADMAPは大枠の方向性、このPLANは開発中の意思決定と実行順を残す場所として使う。
+
+## Planning Pivot v0
+
+Status: **implemented**. `adas_planning` package, replay/overlay CLI, schemas, configs, unit tests (`pytest tests/planning`, 12 passed).
+
+v0 は「perception JSON -> 説明可能な planning overlay / planning JSON」に絞る。最初の主戦場は lane target path、lead vehicle follow、traffic light stop/go、pedestrian/cyclist yield、lane departure warning の 5 つまで。アルゴリズムは rule-based + FSM + geometry + temporal smoothing。QP/MPC/ROS/CARLA/HD map、lane change、merge、汎用交差点 planner、実車制御、steering/brake/actuator command は v0 外。
+
+「pivot 完了」は、デモ動画だけではなく、保存済み perception JSON から planning API を再実行し、PlanningResult JSON と metrics を比較できる状態と定義する。
+
+```bash
+python scripts/replay_planning_json.py \
+  --input outputs/perception_frames.json \
+  --config configs/planning/default.yaml \
+  --output outputs/planning_frames.json
+
+python scripts/demo_planning_video.py \
+  --video examples/dashcam.mp4 \
+  --perception-json outputs/perception_frames.json \
+  --planning-json outputs/planning_frames.json \
+  --output outputs/planning_overlay.mp4
+```
+
+### v0 Scope
+
+| Feature | Priority | Input | Output | Difficulty |
+|---|---:|---|---|---:|
+| Lane keeping target path | P0 | left/right lane polyline, drivable polygon, image size | `target_path`, `behavior=KEEP_LANE`, lane confidence | S |
+| Lead vehicle follow / distance warning | P0 | vehicle detection, `track_id`, `distance_m`, `ground_position_m` | `target_speed_mps`, optional TTC, `FOLLOW_LEAD` warning | M |
+| Traffic light stop/go recommendation | P0 | traffic_light detection, state, confidence, position | `behavior=STOP_FOR_RED` / `GO_CAUTION`, stop warning | M |
+| Pedestrian / cyclist yield warning | P1 | pedestrian/cyclist detection, lane corridor, distance | `YIELD_VRU` warning, target speed cap | M |
+| Lane departure warning | P1 | lane polygon / lane center, ego image center | `LANE_DEPARTURE` warning, lateral offset | S |
+
+Lane keeping は画像座標中心線ベースで推定し、可能な場合だけ ego-ground meters に変換する。既存 `LaneResult` は pixel polyline / polygon 中心なので、v0 の安定解は left/right lane を y 方向に resample して centerline を作ること。camera calibration / IPM / 既存 ground projection がある場合は `x_m`, `z_m` に変換し、ない場合は `target_path_px` を debug に残して confidence を下げる。
+
+Lead follow は `distance_m` の閾値警告を P0 とする。relative velocity / TTC は `track_id` が安定し、距離差分が信頼できるときだけ optional で出す。ego speed がない場合は `target_speed_mps=None`、または config default 由来として debug/source と confidence に明記する。
+
+Traffic light は FSM + debounce + hold を必須にする。red は 2-3 frames 連続で有効化、green は 3-5 frames 連続で解除、unknown は短時間だけ直前状態を hold する。stop line が無い v0 では停止線追従ではなく stop recommendation とする。
+
+### Planning Architecture
+
+この repo は `src/` レイアウトではなくトップレベル package 構成なので、新規 package もトップレベルに追加する。
+
+```text
+adas_perception/              # existing; backward compatibility required
+  ...
+
+adas_planning/                # new import package
+  __init__.py
+  types.py                    # dataclass / enum
+  config.py                   # YAML load + validation
+  io/
+    perception_adapter.py     # perception JSON -> PlanningInput
+    planning_json.py          # PlanningResult save/load
+    schema.py
+  memory/
+    scene_memory.py           # temporal smoothing / hold / debounce support
+    track_history.py
+  planners/
+    lane_target.py
+    lead_follow.py
+    traffic_light.py
+    vru_yield.py
+    lane_departure.py
+  behavior/
+    arbiter.py                # priority merge
+    fsm.py
+  metrics/
+    offline.py
+    scenario_eval.py
+  viz/
+    overlay.py
+
+adas_driving/                 # optional thin orchestration layer only
+  __init__.py
+
+scripts/
+  replay_planning_json.py
+  demo_planning_video.py
+  eval_planning_scenarios.py
+
+configs/planning/
+  default.yaml
+  conservative.yaml
+  aggressive_demo.yaml
+
+schemas/
+  planning_input_v0_1.json
+  planning_result_v0_1.json
+  driving_replay_v0_1.json
+
+tests/planning/
+  test_perception_adapter.py
+  test_planning_json.py
+  test_lane_target.py
+  test_lead_follow.py
+  test_traffic_light_fsm.py
+  test_degenerate_inputs.py
+```
+
+`pyproject.toml` は `adas_perception*` だけを配布対象にしているため、planning 実装時は `adas_planning*` と必要なら `adas_driving*` を include に追加する。既存 `adas_perception` の import surface と JSON schema は壊さない。
+
+### Schema and Types
+
+既存 perception JSON は壊さず、adapter で吸収する。
+
+```text
+perception 0.1
+  -> PlanningInput v0.1
+  -> PlanningResult v0.1
+  -> driving_replay v0.1
+```
+
+方針:
+
+- `schema_version` が無い既存 JSON は adapter が `perception.v0.1` 相当として扱う。
+- minor version は additive only。breaking change は major bump。
+- JSON には `schema_version`, `frame_id`, `timestamp_s`, `coordinate_frame`, `units`, `producer`, `config_hash` を可能な範囲で入れる。
+- planning 内部型は `PlanningInput` に正規化し、planner 本体は perception JSON schema に直接依存しない。
+- 既存 README では `ground_position_m` が `(X 横方向, Z 前方距離) [m]`。Planning 側も `x_m` lateral、`z_m` forward として統一する。
+
+`PlanningResult` の最小フィールド:
+
+- `schema_version`
+- `frame_id`
+- `timestamp_s`
+- `target_path`
+- `target_speed_mps`
+- `behavior`
+- `warnings`
+- `confidence`
+- comparison/debug 用に `lead_object_id`, `stop_reason`, `target_path_px`, `debug` を v0 から持たせると再実行評価が楽になる。
+
+Behavior arbitration priority:
+
+```text
+STOP_FOR_RED / YIELD_VRU
+  > FOLLOW_LEAD
+  > LANE_DEPARTURE warning
+  > KEEP_LANE
+  > CAUTION / UNKNOWN
+```
+
+`target_speed_mps` は各 module の speed cap の `min()` で決める。ただし ego speed が無い場合は `None` 許容、または config default 由来として confidence を下げる。
+
+### Robustness Rules
+
+- Perception は truth ではなく measurement として扱う。
+- missing / noisy input は fail-soft。lane 欠落時は前回 path を短時間 hold、confidence decay、behavior は CAUTION に寄せる。
+- planner 側にも `SceneMemory` を置き、perception の smoothing だけに依存しない。
+- follow distance、TTC、traffic light state、lane departure は enter/exit 閾値を分ける。
+- object selection は `track_id` だけに依存しない。ID switch 時は lane corridor 内の最近傍 object を再選択し、relative velocity は reset する。
+- API 名は warning / recommendation / target に留め、実車制御に見える command 名は使わない。
+
+### Phase Plan
+
+| Phase | Duration | Build | Done | Explicitly out |
+|---|---|---|---|---|
+| Phase 0 | 1-2 weeks | `adas_planning` package, types, schema, adapter, lane target, lead follow, traffic light FSM, offline replay, overlay | saved perception JSON から PlanningResult を再生成できる。3 本以上の dashcam 動画で target path / behavior / warnings overlay が出る。lane missing / empty detections / traffic light flicker の unit test が通る | control, steering/brake command, ROS, CARLA, HD map, lane change, intersection turn, perception retraining |
+| Phase 1 | mostly done | pedestrian yield ✅, lane departure ✅, pseudo ego speed ✅, scenario YAML ✅, metrics/config compare CLI ✅, end-to-end demo ✅ | versioned metrics artifact ✅ (`planning_metrics.v0.1`) | QP/MPC, full Frenet, closed-loop simulation, actuator, safety claims |
+| Phase 2 | next | scenario corpus ✅, perturbation tests ✅, baseline planner compare, optional benchmark adapter | noise/ID switch/distance noise regression tests in CI ✅。planning JSON metrics artifact versioning 未 | FAD claims, HD map requirement, CARLA requirement, real-car operation, generic intersection planner |
+
+### First PR Split
+
+PR 1: `feat(planning): add adas_planning data model and perception adapter`
+
+- Add `adas_planning/__init__.py`, `types.py`, `config.py`, `io/perception_adapter.py`, `io/planning_json.py`
+- Add `schemas/planning_input_v0_1.json`, `schemas/planning_result_v0_1.json`
+- Add `configs/planning/default.yaml`
+- Add adapter / JSON round-trip tests
+- Update `pyproject.toml` package include and README planning note
+- Done when existing perception JSON converts to `PlanningInput`, schema-less old JSON reads, and empty lane/detections/bad confidence do not crash.
+
+PR 2: `feat(planning): implement rule-based v0 planners and behavior arbiter`
+
+- Add `SceneMemory`, `TrackHistory`, lane target, lead follow, traffic light, VRU yield, lane departure, arbiter/FSM modules
+- Done when 1 frame + memory returns `PlanningResult`, lane missing holds briefly with confidence decay, red/green flicker is debounced, and lead ID switch does not crash.
+
+PR 3: `feat(demo): add planning replay, overlay renderer, and offline metrics`
+
+- Add replay CLI, overlay video CLI, scenario eval CLI, planning metrics, overlay renderer, example scenario YAML, docs
+- Done when saved perception JSON can be replayed, overlay mp4 is generated, config metrics can be compared, and Japanese README clearly says this is not for safety or real-vehicle operation.
+
+### Minimum Metrics and Overlay
+
+Minimum metrics:
+
+- availability: `target_path_valid_rate`, `behavior_output_rate`, `planning_latency_ms`
+- stability: `behavior_switch_count_per_min`, `target_path_lateral_delta_mean`, `target_speed_delta_mean`, `warning_flicker_count`
+- scenario correctness: `expected_behavior_match_rate`, `red_stop_recall`, `false_stop_rate`, `lead_selected_rate`, `pedestrian_yield_warning_recall`
+- risk proxy: `min_ttc_s`, `ttc_warning_lead_time_s`, `close_follow_frame_count`, `lane_departure_warning_lead_time_s`
+- robustness: `result_valid_under_lane_dropout`, `result_valid_under_distance_noise`, `result_valid_under_id_switch`
+
+Minimum overlay:
+
+- lane left/right
+- drivable polygon
+- target path
+- selected lead vehicle highlight
+- TTC / distance
+- traffic light state with debounce status
+- behavior label
+- target speed
+- warnings list
+- confidence bar
+
+### Open Questions
+
+- Existing `LaneResult` polyline is pixel-only or already projected in some configs?
+- `ground_position_m` axes are documented as lateral X / forward Z; confirm sign convention before public schema wording.
+- In v0, should ego speed remain `None` by default, or should config default speed be injected with explicit low confidence?
+- Multiple traffic lights: v0 association can use upper-center + confidence + debounce, but docs need a limitation note.
+- No stop line: red light stop recommendation should use a fixed proxy distance or lane horizon endpoint.
+- Demo video redistribution: BDD100K-derived clips cannot be committed unless license/redistribution is checked.
+- README / schema / CLI should repeat: research/demo/education only, no vehicle control, no safety suitability.
 
 ## Codex Handoff
 
@@ -40,29 +254,15 @@ Last updated: 2026-04-26 (Codex 引き継ぎ版。Phase 7-9 + lane segmentation 
 
 ### Codex が次にやるべきこと (優先順)
 
-A) **README polish (~15min)**: 冒頭に TL;DR / one-liner install / hero GIF +
-   feature bullet を上げる。Autoware/OpenPilot との位置付け表 (PLAN にすでに
-   ある) を README に転記。badges (license / Python / OS) を追加。
+A) **README polish (~15min)**: ✅ TL;DR / one-liner install / hero MP4+poster / feature bullets / Autoware/OpenPilot 位置付け表 / badges 追加済み
 
-B) **WBF accuracy chart (~15min)**: ladder 0.6355 → 0.6763 を bar/line で
-   render、`assets/wbf_ladder.png` に保存して README に貼る。「inference-side
-   のみで +0.04」のインパクトが視覚化される。
+B) **WBF accuracy chart (~15min)**: ✅ `scripts/render_wbf_ladder.py` → `assets/wbf_ladder.png`、README 掲載済み
 
-C) **YOLOP 統合比較 (~20min)**: 36 MB MIT で BDD100K-trained。
-   `https://raw.githubusercontent.com/Kazuhito00/YOLOP-ONNX-Video-Inference-Sample/main/weights/yolop-640-640.onnx`
-   から落として `LaneSegmentationDetector` で lane head を読む。
-   `evaluate_lane.py` で TwinLiteNet vs YOLOP を comparative stats。
-   YOLOP は object detection も内蔵なので 7-way WBF との比較もできる。
+C) **YOLOP 統合比較 (~20min)**: ✅ `configs/lane_yolop.yaml` 追加、`evaluate_lane.py` 比較コマンドを README 記載
 
-D) **CI / pytest (~30min)**: 既存の smoke test (現状はワンライナー散在) を
-   `tests/` に整理し、`pytest -k "not slow"` で軽量テストを通す。GitHub
-   Actions で PR ごとに走らせる。focus: tracker (unit), distance projection
-   (unit), traffic_light state (unit)、lane detector smoke (1 image)。
+D) **CI / pytest (~30min)**: ✅ `tests/` に tracker/distance/traffic_light/lane smoke + planning tests、`pytest -k "not slow"`、GitHub Actions CI
 
-E) **README hero MP4 化** (~10min): GIF 5MB を MP4 ~2MB に置換すると GitHub
-   での再生品質が上がる。`<video>` tag は markdown で strip されるので、
-   PR/Issue に attach した URL を使う方法がある。または HTML 描画される
-   `[![demo](thumbnail.png)](raw_mp4_url)` 風に。
+E) **README hero MP4 化** (~10min): ✅ `assets/demo_wbf7.mp4` (804 KB) + poster、README リンク化
 
 F) **官公 train split が user 側で配置されたら**: `bash
    scripts/run_bdd100k_official_train.sh` をそのまま走らせる。10 epoch で
@@ -76,6 +276,12 @@ G) **Jetson 実機が手に入ったら**: ONNX export → TensorRT engine (FP16
 H) **Phase 8 残り (defer 可)**: BDD100K lane labels (`lane_train.json` /
    `lane_val.json`、別 zip) を入れて `scripts/evaluate_lane.py --labels` で
    IoU/F1 比較。CV vs TwinLiteNet vs YOLOP の定量比較が完成する。
+
+I) **Planning Phase 1 (~2026-06-10 実装)**: ✅ end-to-end demo
+   (`scripts/run_planning_demo.py`)、scenario YAML コーパス (`scenarios/`)、
+   `adas_planning/metrics/scenario_eval.py`、perturbation regression tests、
+   CI scenario gate、**pseudo ego speed** (`adas_planning/ego/pseudo_speed.py`)、
+   versioned metrics artifact (`planning_metrics.v0.1`)。
 
 ### このセッションで入った主な変更 (2026-04-25 〜 26)
 

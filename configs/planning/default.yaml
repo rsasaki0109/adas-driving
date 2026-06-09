@@ -1,0 +1,51 @@
+schema_version: planning.v0.1
+
+pseudo_ego_speed:
+  default_mps: null
+  config_confidence_factor: 0.65
+  max_mps: 40.0
+  closing_rate:
+    enabled: true
+    min_range_rate_mps: 0.5
+    confidence_factor: 0.45
+
+memory:
+  lane_hold_frames: 5
+  lane_decay_per_frame: 0.12
+
+lane_target:
+  num_samples: 16
+  min_lane_confidence: 0.15
+  path_y_start_ratio: 0.95
+  path_y_end_ratio: 0.55
+
+lead_follow:
+  warning_distance_m: 12.0
+  critical_distance_m: 6.0
+  lane_corridor_width_ratio: 0.55
+  min_vehicle_confidence: 0.25
+  track_history_frames: 12
+  ttc_warning_s: 2.5
+  default_ego_speed_mps: null
+
+traffic_light:
+  min_confidence: 0.25
+  red_enter_frames: 2
+  green_exit_frames: 3
+  unknown_hold_frames: 2
+
+vru_yield:
+  warning_distance_m: 25.0
+  lane_corridor_width_ratio: 0.70
+  min_confidence: 0.30
+  speed_cap_ratio: 0.5
+  default_ego_speed_mps: null
+
+lane_departure:
+  enter_offset_ratio: 0.18
+  exit_offset_ratio: 0.12
+  ego_x_ratio: 0.5
+  ego_y_ratio: 0.92
+
+overlay:
+  panel_alpha: 0.82

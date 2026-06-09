@@ -1,10 +1,48 @@
 # adas-perception
 
-`adas-perception` は、単眼カメラ画像/動画から車線・車両・歩行者・標識・信号候補を検出して可視化する、デモ重視のPython製ADAS認識OSSです。
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Jetson-lightgrey)
+![Tests](https://img.shields.io/badge/tests-pytest-brightgreen)
 
-![demo](assets/demo_wbf7.gif)
+**TL;DR:** 単眼 dashcam から車線・物体・標識・信号候補を検出して可視化する、軽量 Python ADAS 認識デモ。BDD100K 上で macro F1 **0.6763** (7-way WBF, inference-side only) まで再現可能。保存済み perception JSON から rule-based planning overlay も再実行できます。**研究・デモ・教育向け** — 車両制御や安全性能保証用途ではありません。
 
-*(全部入りデモ出力: 7-way WBF 物体検出 + TwinLiteNet ONNX lane segmentation + ByteTrack 風 two-stage tracker + 単眼距離 + traffic_light state 分類 (red/yellow/green/off で box 色変化)。Pexels CC0 dashcam: [Dash Cam View Of The Road](https://www.pexels.com/video/dash-cam-view-of-the-road-5921059/))*
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -U pip && pip install -r requirements.txt
+python scripts/demo_video.py --input path/to/drive.mp4 --output outputs/drive_adas.mp4
+```
+
+[![Demo video (MP4)](assets/demo_wbf7_poster.png)](assets/demo_wbf7.mp4)
+
+*(全部入りデモ: 7-way WBF 物体検出 + lane segmentation + tracker + 単眼距離 + traffic_light state。Pexels CC0: [Dash Cam View Of The Road](https://www.pexels.com/video/dash-cam-view-of-the-road-5921059/). 高品質版 MP4 は 804 KB / GIF は 4.8 MB)*
+
+### 主要機能
+
+- BDD100K fine-tuned YOLO + online 7-way WBF (macro F1 **0.6763** on odd 5000)
+- OpenCV / TwinLiteNet / YOLOP lane backend
+- ByteTrack 風 tracker + 単眼距離 + HSV traffic_light state
+- perception / planning JSON replay + overlay CLI
+- Gradio web demo (ROS / X11 不要)
+
+### 他スタックとの位置付け
+
+| | adas-perception | Autoware | OpenPilot |
+|---|---|---|---|
+| 目的 | 認識デモ + 公開データ評価 + planning overlay | 自動運転ソフトウェア基盤 | 量産 ADAS 製品 |
+| セットアップ | pip install 数分 | ROS2 + 大規模依存 | 専用 HW / fork 前提 |
+| GUI | ブラウザ (gradio) / OpenCV | RViz (重い) | 専用 UI |
+| 車両制御 | **なし** (warning/recommendation のみ) | あり | あり |
+| 再現評価 | BDD100K macro F1 / lane compare CLI | 別体系 | 非公開 |
+
+### WBF accuracy ladder (inference-side, no retrain)
+
+![WBF macro-F1 ladder on BDD100K odd 5000](assets/wbf_ladder.png)
+
+`0.6355` (no-TTA baseline) → `0.6763` (7-way WBF per-kind IoU online) = **+0.0408 macro F1**。再生成: `python scripts/render_wbf_ladder.py`
+
+---
+
+`adas-perception` は、単眼カメラ画像/動画から車線・車両・歩行者・標識・信号候補を検出して可視化する、デモ重視のPython製ADAS認識OSSです。保存済み perception JSON から rule-based planning overlay / planning JSON を再生成する `adas_planning` も同梱しています（研究・デモ・教育向け。車両制御や安全性能保証の用途ではありません）。
 
 ## 今できること
 
@@ -188,6 +226,21 @@ python scripts/demo_image.py --input path/to/road.jpg \
 ```
 
 `configs/lane_twinlitenet.yaml` は lane backend だけ segmentation に差し替える小さい preset です。物体検出と組み合わせるときはベース config と一緒に指定してください。
+
+YOLOP lane segmentation (BDD100K-trained, MIT, ~36 MB) を比較する場合:
+
+```bash
+mkdir -p outputs/models
+wget -O outputs/models/yolop-640-640.onnx \
+  https://raw.githubusercontent.com/Kazuhito00/YOLOP-ONNX-Video-Inference-Sample/main/weights/yolop-640-640.onnx
+python scripts/evaluate_lane.py \
+  --images-root data/bdd100k/images/100k/val \
+  --max-images 100 \
+  --configs cv=configs/default.yaml twinlite=configs/lane_twinlitenet.yaml yolop=configs/lane_yolop.yaml \
+  --output outputs/lane_eval_cv_twinlite_yolop.json
+```
+
+`configs/lane_yolop.yaml` は YOLOP の `lane_line_seg` head だけを `LaneSegmentationDetector` 経由で読みます (物体検出 head は未使用)。
 
 ブラウザ可視化 (gradioベース、headless / Jetson 想定):
 
@@ -417,6 +470,47 @@ python scripts/evaluate_bdd100k.py \
 ```
 
 `scripts/evaluate_json.py` は、総検出数、種別ごとの件数、平均confidence、車線検出フレーム数、推定距離の平均/最近/最遠、track IDの継続フレーム数を集計します。
+
+## Planning overlay (adas_planning)
+
+保存済み perception JSON から rule-based planning を再実行し、planning JSON と overlay 動画を生成できます。これは **warning / recommendation / target path** を可視化する研究・デモ用途であり、steering/brake 等の車両制御命令や安全性能保証を目的としません。
+
+**ワンコマンド end-to-end デモ** (同梱 `assets/demo_wbf7.mp4` + synthetic perception fixture):
+
+```bash
+python scripts/run_planning_demo.py \
+  --video assets/demo_wbf7.mp4 \
+  --output-dir outputs/planning_demo \
+  --compare-configs
+```
+
+個別ステップ:
+
+```bash
+python scripts/replay_planning_json.py \
+  --input examples/fixtures/planning_demo_perception.json \
+  --config configs/planning/default.yaml \
+  --output outputs/planning_frames.json
+
+python scripts/demo_planning_video.py \
+  --video assets/demo_wbf7.mp4 \
+  --perception-json examples/fixtures/planning_demo_perception.json \
+  --planning-json outputs/planning_frames.json \
+  --output outputs/planning_overlay.mp4
+
+python scripts/eval_planning_scenarios.py \
+  --input examples/fixtures/planning_demo_perception.json \
+  --configs default=configs/planning/default.yaml conservative=configs/planning/conservative.yaml \
+  --output outputs/planning_config_compare.json
+
+python scripts/eval_planning_scenarios.py \
+  --scenarios-dir scenarios \
+  --output outputs/planning_scenarios_report.json
+```
+
+v0 scope: lane target path, lead follow distance warning, traffic light stop/go recommendation (FSM + debounce), pedestrian/cyclist yield warning, lane departure warning。設定は `configs/planning/default.yaml` / `conservative.yaml` / `aggressive_demo.yaml`。
+
+**pseudo ego speed** (`pseudo_ego_speed` config): perception JSON に `ego_speed_mps` が無い場合、優先順は `measurement` → `config_default` → `closing_rate`（接近レンジレート、低 confidence）→ `none`。`replay_planning_json.py --metrics-output` は `planning_metrics.v0.1` schema で metrics artifact を保存します。
 
 ## ベンチマーク
 

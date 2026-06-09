@@ -1,0 +1,25 @@
+from __future__ import annotations
+
+PLANNING_INPUT_SCHEMA_VERSION = "planning_input.v0.1"
+PLANNING_RESULT_SCHEMA_VERSION = "planning.v0.1"
+DRIVING_REPLAY_SCHEMA_VERSION = "driving_replay.v0.1"
+PERCEPTION_SCHEMA_VERSION = "0.1"
+
+BEHAVIOR_VALUES = [
+    "KEEP_LANE",
+    "FOLLOW_LEAD",
+    "STOP_FOR_RED",
+    "GO_CAUTION",
+    "YIELD_VRU",
+    "LANE_DEPARTURE",
+    "CAUTION",
+    "UNKNOWN",
+]
+
+WARNING_CODES = [
+    "FOLLOW_DISTANCE",
+    "STOP_RECOMMENDATION",
+    "YIELD_VRU",
+    "LANE_DEPARTURE",
+    "LOW_CONFIDENCE",
+]

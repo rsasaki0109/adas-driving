@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Driving replay v0.1",
+  "type": "object",
+  "required": ["schema_version", "frames"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "driving_replay.v0.1" },
+    "source": { "type": ["string", "null"] },
+    "config": { "type": ["string", "null"] },
+    "config_hash": { "type": ["string", "null"] },
+    "producer": { "type": "string" },
+    "perception_schema_version": { "type": "string" },
+    "planning_schema_version": { "type": "string" },
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["frame_id", "perception", "planning"],
+        "properties": {
+          "frame_id": { "type": "integer" },
+          "timestamp_s": { "type": "number" },
+          "perception": { "type": "object" },
+          "planning": { "type": "object" }
+        }
+      }
+    }
+  }
+}
