@@ -15,6 +15,8 @@ if str(ROOT) not in sys.path:
 
 from adas_planning.io.driving_replay import write_driving_replay_document
 
+DEFAULT_PERCEPTION_CONFIG = "configs/bdd100k_yolo_kind_tuned_post_nms.yaml"
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -26,8 +28,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--perception-config",
-        default="configs/default.yaml",
-        help="Perception YAML when --run-perception is set.",
+        default=DEFAULT_PERCEPTION_CONFIG,
+        help=(
+            "Perception YAML when --run-perception is set "
+            f"(default: {DEFAULT_PERCEPTION_CONFIG})."
+        ),
     )
     parser.add_argument("--config", default="configs/planning/default.yaml", help="Planning config.")
     parser.add_argument("--output-dir", default="outputs/planning_demo", help="Output directory.")

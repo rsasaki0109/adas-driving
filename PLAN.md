@@ -270,8 +270,9 @@ F) **官公 train split** — **deferred (当面スキップ)**。再開時: `RU
    scripts/bootstrap_bdd100k_official_train.sh`
 
 G) **Jetson 実機が手に入ったら**: ONNX export → TensorRT engine (FP16/INT8)、
-   軽量 config (640px no-TTA preset)、`scripts/web_demo.py` を実機で起動して
+   軽量 config (`configs/bdd100k_yolo_jetson_640_onnx.yaml`)、`scripts/web_demo.py` を実機で起動して
    LAN ブラウザから検証。FPS 実測が取れたら README へ反映。
+   dev マシンだけでも `python scripts/export_yolo_onnx.py --imgsz 640 --write-manifest` で ONNX 化可能。
 
 H) **Phase 8 残り (defer 可)**: BDD100K lane labels (`lane_train.json` /
    `lane_val.json`、別 zip) を入れて `scripts/evaluate_lane.py --labels` で
@@ -294,6 +295,8 @@ J) **Planning Phase 2 + inference-side (~2026-06-10)**: ✅ baseline planner com
    E2E demo (`scripts/run_planning_demo.py` → planning overlay + driving_replay +
    optional `--run-perception` / `--compare-configs` / `--export-benchmark`)、
    web demo planning overlay (`scripts/web_demo.py` — optional planning HUD)。
+   E2E `--run-perception` default: `configs/bdd100k_yolo_kind_tuned_post_nms.yaml`。
+   Jetson prep: `scripts/export_yolo_onnx.py` + `configs/bdd100k_yolo_jetson_640_onnx.yaml`。
 
 **Post-NMS production sweep (2026-06-10, odd 5,000 report split):**
 

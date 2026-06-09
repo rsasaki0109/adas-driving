@@ -94,7 +94,7 @@ python scripts/run_planning_demo.py \
 
 出力: `planning_frames.json`, `planning_overlay.mp4`, `driving_replay.json` (perception + planning 統合)
 
-**動画から perception → planning まで一括** (torchvision baseline、追加重み不要):
+**動画から perception → planning まで一括** (`outputs/models/adas_yolov8n_bdd100k.pt` 配置済み、post-NMS preset がデフォルト):
 
 ```bash
 python scripts/run_planning_demo.py \
@@ -104,7 +104,17 @@ python scripts/run_planning_demo.py \
   --output-dir outputs/planning_demo_live
 ```
 
-**finetuned 重みあり** (`outputs/models/adas_yolov8n_bdd100k.pt` 配置済み):
+追加重み不要の torchvision baseline に戻す場合:
+
+```bash
+python scripts/run_planning_demo.py \
+  --run-perception \
+  --perception-config configs/default.yaml \
+  --video assets/demo_wbf7.mp4 \
+  --output-dir outputs/planning_demo_torchvision
+```
+
+**finetuned 1024px (post-NMS 明示)**:
 
 ```bash
 python scripts/run_planning_demo.py \
@@ -126,6 +136,26 @@ python scripts/run_planning_demo.py \
 
 設定: `configs/planning/default.yaml` / `conservative.yaml` / `aggressive_demo.yaml`  
 scenario 評価: `python scripts/eval_planning_scenarios.py --scenarios-dir scenarios --output outputs/scenarios.json`
+
+### Jetson / ONNX export
+
+dev マシンで ONNX を書き出し、Jetson 実機で TensorRT 化する前提の軽量 preset です。
+
+```bash
+pip install -e ".[yolo]"
+python scripts/export_yolo_onnx.py --imgsz 640 --write-manifest
+python scripts/benchmark.py \
+  --input assets/demo_wbf7.mp4 \
+  --config configs/bdd100k_yolo_jetson_640_onnx.yaml \
+  --max-frames 60
+```
+
+Jetson 側の例:
+
+```bash
+trtexec --onnx=outputs/models/adas_yolov8n_bdd100k_640.onnx \
+  --saveEngine=outputs/models/adas_yolov8n_bdd100k_640.engine --fp16
+```
 
 ---
 
@@ -183,6 +213,7 @@ RUN_TRAIN=1 bash scripts/bootstrap_bdd100k_official_train.sh 10
 | `scripts/evaluate_bdd100k.py` | BDD100K 評価 |
 | `scripts/evaluate_lane.py` | 車線 detector 比較 |
 | `scripts/benchmark.py` | FPS / レイテンシ計測 |
+| `scripts/export_yolo_onnx.py` | YOLO → ONNX export (Jetson 向け) |
 | `scripts/prepare_bdd100k.py` | データ配置・検証 |
 
 ---

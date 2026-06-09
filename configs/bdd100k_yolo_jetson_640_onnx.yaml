@@ -1,0 +1,65 @@
+# Jetson / edge preset: 640px ONNX YOLO + production post-NMS thresholds.
+# Export first:
+#   python scripts/export_yolo_onnx.py --imgsz 640 --write-manifest
+# Then benchmark locally or convert to TensorRT on Jetson hardware.
+objects:
+  enabled: true
+  backend: ultralytics
+  model: outputs/models/adas_yolov8n_bdd100k_640.onnx
+  device: auto
+  image_size: 640
+  augment: false
+  score_threshold: 0.20
+  score_thresholds_by_kind:
+    pedestrian: 0.20
+    vehicle: 0.25
+    traffic_sign: 0.25
+    traffic_light: 0.20
+  iou_threshold: 0.50
+  max_detections: 120
+  class_groups:
+    pedestrian:
+      - pedestrian
+      - rider
+    vehicle:
+      - bicycle
+      - bus
+      - car
+      - motorcycle
+      - train
+      - truck
+    traffic_sign:
+      - traffic sign
+    traffic_light:
+      - traffic light
+  post_process:
+    enabled: true
+    nms:
+      enabled: true
+      default_iou: 0.45
+      iou_by_kind:
+        pedestrian: 0.45
+        traffic_light: 0.35
+        traffic_sign: 0.40
+        vehicle: 0.50
+    min_area_ratio_by_kind:
+      traffic_light: 0.00008
+      traffic_sign: 0.00008
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+lane_smoothing:
+  enabled: false
+
+tracking:
+  enabled: false
+
+distance_estimation:
+  enabled: false
+
+visualization:
+  show_summary: true
