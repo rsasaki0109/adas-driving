@@ -78,11 +78,36 @@ python scripts/web_demo.py
 
 ### Planning overlay
 
+**クイックデモ** (同梱 fixture、GPU 重み不要):
+
 ```bash
 python scripts/run_planning_demo.py \
   --video assets/demo_wbf7.mp4 \
   --output-dir outputs/planning_demo \
-  --compare-configs
+  --compare-configs \
+  --export-benchmark
+```
+
+出力: `planning_frames.json`, `planning_overlay.mp4`, `driving_replay.json` (perception + planning 統合)
+
+**動画から perception → planning まで一括** (torchvision baseline、追加重み不要):
+
+```bash
+python scripts/run_planning_demo.py \
+  --run-perception \
+  --video assets/demo_wbf7.mp4 \
+  --max-frames 120 \
+  --output-dir outputs/planning_demo_live
+```
+
+**finetuned 重みあり** (`outputs/models/adas_yolov8n_bdd100k.pt` 配置済み):
+
+```bash
+python scripts/run_planning_demo.py \
+  --run-perception \
+  --perception-config configs/bdd100k_yolo_wbf7_demo.yaml \
+  --video assets/demo_wbf7.mp4 \
+  --output-dir outputs/planning_demo_wbf7
 ```
 
 設定: `configs/planning/default.yaml` / `conservative.yaml` / `aggressive_demo.yaml`  

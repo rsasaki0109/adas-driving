@@ -38,3 +38,10 @@ jobs:
             --csv outputs/ci_planning_benchmark.csv \
             --markdown outputs/ci_planning_benchmark.md \
             --json outputs/ci_planning_benchmark_export.json
+      - name: Run planning E2E demo
+        run: |
+          python scripts/run_planning_demo.py \
+            --output-dir outputs/ci_planning_demo \
+            --max-frames 5 \
+            --compare-configs \
+            --export-benchmark

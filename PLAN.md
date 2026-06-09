@@ -164,7 +164,7 @@ STOP_FOR_RED / YIELD_VRU
 |---|---|---|---|---|
 | Phase 0 | 1-2 weeks | `adas_planning` package, types, schema, adapter, lane target, lead follow, traffic light FSM, offline replay, overlay | saved perception JSON から PlanningResult を再生成できる。3 本以上の dashcam 動画で target path / behavior / warnings overlay が出る。lane missing / empty detections / traffic light flicker の unit test が通る | control, steering/brake command, ROS, CARLA, HD map, lane change, intersection turn, perception retraining |
 | Phase 1 | mostly done | pedestrian yield ✅, lane departure ✅, pseudo ego speed ✅, scenario YAML ✅, metrics/config compare CLI ✅, end-to-end demo ✅ | versioned metrics artifact ✅ (`planning_metrics.v0.1`) | QP/MPC, full Frenet, closed-loop simulation, actuator, safety claims |
-| Phase 2 | mostly done | scenario corpus ✅, perturbation tests ✅, baseline planner compare ✅, inference post-process ✅, benchmark adapter ✅ | baseline compare artifact ✅, metrics validation ✅, post-NMS sweep pipeline ✅, CSV/MD export ✅, driving_replay export ✅ | FAD claims, HD map requirement, CARLA requirement, real-car operation, generic intersection planner |
+| Phase 2 | done | scenario corpus ✅, perturbation tests ✅, baseline planner compare ✅, inference post-process ✅, benchmark adapter ✅, E2E demo + driving_replay ✅ | baseline compare artifact ✅, metrics validation ✅, post-NMS sweep pipeline ✅, CSV/MD export ✅, driving_replay export ✅, `run_planning_demo.py` 統合 ✅ | FAD claims, HD map requirement, CARLA requirement, real-car operation, generic intersection planner |
 
 ### First PR Split
 
@@ -290,7 +290,9 @@ J) **Planning Phase 2 + inference-side (~2026-06-10)**: ✅ baseline planner com
    cached sweep `scripts/sweep_bdd100k_postprocess.py`、
    bootstrap sweep pipeline `scripts/run_postprocess_sweep_pipeline.sh`、
    benchmark adapter (`scripts/export_planning_benchmark.py`, CSV/MD/JSON export,
-   `scripts/export_driving_replay.py` → `driving_replay.v0.1`)。
+   `scripts/export_driving_replay.py` → `driving_replay.v0.1`)、
+   E2E demo (`scripts/run_planning_demo.py` → planning overlay + driving_replay +
+   optional `--run-perception` / `--compare-configs` / `--export-benchmark`)。
 
 **Post-NMS production sweep (2026-06-10, odd 5,000 report split):**
 
