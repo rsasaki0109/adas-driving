@@ -1,0 +1,17 @@
+schema_version: planning_scenario.v0.1
+name: baseline_compare_all
+description: All baseline planning configs produce valid metrics on the demo fixture.
+perception_json: examples/fixtures/planning_demo_perception.json
+config: configs/planning/default.yaml
+configs:
+  default: configs/planning/default.yaml
+  conservative: configs/planning/conservative.yaml
+  aggressive_demo: configs/planning/aggressive_demo.yaml
+checks:
+  - name: default_valid_confidence
+    type: result_valid_all_frames
+  - name: conservative_path_valid_rate
+    type: config_metric_gte
+    config: conservative
+    than_config: default
+    metric: target_path_valid_rate

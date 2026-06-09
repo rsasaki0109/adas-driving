@@ -98,14 +98,13 @@ def main() -> int:
         _run(
             [
                 sys.executable,
-                "scripts/eval_planning_scenarios.py",
+                "scripts/compare_planning_baselines.py",
                 "--input",
                 str(perception_json),
-                "--configs",
-                "default=configs/planning/default.yaml",
-                "conservative=configs/planning/conservative.yaml",
                 "--output",
                 str(compare_json),
+                "--metrics-dir",
+                str(output_dir / "baseline_metrics"),
             ]
         )
 

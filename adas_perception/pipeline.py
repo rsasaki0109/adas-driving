@@ -15,6 +15,7 @@ from adas_perception.detectors import (
 )
 from adas_perception.distance import MonocularDistanceEstimator
 from adas_perception.lane_smoothing import LaneSmoother
+from adas_perception.postprocess import apply_postprocess, build_post_process_config
 from adas_perception.tracking import SimpleTracker
 from adas_perception.traffic_light_state import TrafficLightStateClassifier
 from adas_perception.types import Box, Detection, LaneResult, PerceptionResult
@@ -35,6 +36,7 @@ class ADASPerceptionPipeline:
             str(kind): float(value)
             for kind, value in (config.get("objects", {}).get("post_fusion_score_thresholds_by_kind", {}) or {}).items()
         }
+        self.post_process_config = build_post_process_config(config.get("objects", {}).get("post_process", {}))
         self._wbf_fn = _load_wbf() if self.fusion_config["mode"] == "wbf" else None
         self.sign_detector = (
             ColorSignDetector(config.get("signs", {})) if config.get("signs", {}).get("enabled", True) else None
@@ -86,9 +88,18 @@ class ADASPerceptionPipeline:
                 if det.confidence >= self.post_fusion_score_thresholds.get(det.kind, 0.0)
             ]
         detections = _suppress_signs_over_traffic_lights(detections)
-        nms_iou = float(self.fusion_config.get("post_nms_iou", 0.50))
-        if self.fusion_config["mode"] != "wbf" and nms_iou > 0.0:
-            detections = _nms_by_kind(detections, iou_threshold=nms_iou)
+        if self.post_process_config.get("enabled", False):
+            detections = apply_postprocess(detections, self.post_process_config, frame_bgr.shape[:2])
+        else:
+            nms_iou = float(self.fusion_config.get("post_nms_iou", 0.50))
+            post_nms_enabled = bool(
+                self.fusion_config.get(
+                    "post_nms",
+                    self.fusion_config["mode"] != "wbf",
+                )
+            )
+            if post_nms_enabled and nms_iou > 0.0:
+                detections = _nms_by_kind(detections, iou_threshold=nms_iou)
         detections = self.tracker.update(detections)
         detections = self.distance_estimator.estimate(detections, frame_bgr)
         detections = self.traffic_light_state_classifier.classify(frame_bgr, detections)
@@ -137,6 +148,7 @@ def _build_fusion_config(raw: dict[str, Any]) -> dict[str, Any]:
         "iou_thr": float(raw.get("iou_thr", 0.55)),
         "kind_iou_thr": {str(k): float(v) for k, v in kind_iou_raw.items()},
         "weights": [float(w) for w in weights_raw] if weights_raw else None,
+        "post_nms": bool(raw.get("post_nms", False)),
         "post_nms_iou": float(raw.get("post_nms_iou", 0.50)),
     }
 

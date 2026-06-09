@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adas-driving.local/schemas/planning_benchmark_export_v0_1.json",
+  "title": "Planning benchmark export v0.1",
+  "type": "object",
+  "required": ["schema_version", "rows", "producer"],
+  "properties": {
+    "schema_version": {
+      "const": "planning_benchmark_export.v0.1"
+    },
+    "source_compare_schema": { "type": "string" },
+    "source": { "type": ["string", "null"] },
+    "baseline": { "type": "string" },
+    "producer": { "type": "string" },
+    "metrics_schema_version": { "type": "string" },
+    "rows": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "deltas_vs_baseline": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "number" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

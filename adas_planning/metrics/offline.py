@@ -7,6 +7,7 @@ from typing import Any
 from adas_planning.types import Behavior, PlanningResult
 
 METRICS_SCHEMA_VERSION = "planning_metrics.v0.1"
+COMPARE_SCHEMA_VERSION = "planning_baseline_compare.v0.1"
 
 
 def compute_offline_metrics(results: list[PlanningResult]) -> dict[str, Any]:
@@ -36,6 +37,23 @@ def compute_offline_metrics(results: list[PlanningResult]) -> dict[str, Any]:
     }
 
 
+def validate_metrics_artifact(payload: dict[str, Any]) -> None:
+    if payload.get("schema_version") != METRICS_SCHEMA_VERSION:
+        raise ValueError(f"unsupported metrics schema: {payload.get('schema_version')}")
+    metrics = payload.get("metrics")
+    if not isinstance(metrics, dict):
+        raise ValueError("metrics artifact must include metrics mapping")
+    if "frame_count" not in metrics:
+        raise ValueError("metrics artifact missing frame_count")
+
+
+def load_metrics_artifact(path: str | Path) -> dict[str, Any]:
+    with Path(path).open("r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+    validate_metrics_artifact(payload)
+    return payload
+
+
 def write_metrics_artifact(
     path: str | Path,
     metrics: dict[str, Any],
@@ -55,6 +73,7 @@ def write_metrics_artifact(
     }
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    validate_metrics_artifact(payload)
     with output_path.open("w", encoding="utf-8") as handle:
         json.dump(payload, handle, ensure_ascii=False, indent=2)
         handle.write("\n")

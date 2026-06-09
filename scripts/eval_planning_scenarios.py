@@ -10,11 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from adas_planning.config import config_hash, load_config
-from adas_planning.io.perception_adapter import adapt_perception_document
-from adas_planning.metrics.offline import compute_offline_metrics
+from adas_planning.metrics.baseline_compare import compare_planning_configs, write_baseline_compare_artifact
 from adas_planning.metrics.scenario_eval import evaluate_scenario, evaluate_scenarios_dir, load_scenario
-from adas_planning.pipeline import PlanningPipeline
 
 
 def parse_args() -> argparse.Namespace:
@@ -90,26 +87,15 @@ def main() -> int:
 
     with Path(args.input).open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    planning_inputs = adapt_perception_document(payload)
 
-    comparison: dict[str, object] = {"input": str(args.input), "configs": {}}
-    for name, config_path in _parse_config_entries(args.configs):
-        config = load_config(config_path)
-        pipeline = PlanningPipeline(config)
-        results = [pipeline.plan(planning_input) for planning_input in planning_inputs]
-        comparison["configs"][name] = {
-            "config_path": config_path,
-            "config_hash": config_hash(config),
-            "metrics": compute_offline_metrics(results),
-            "sample_behaviors": [result.behavior.value for result in results[:5]],
-        }
-
-    output_path = Path(args.output)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", encoding="utf-8") as handle:
-        json.dump(comparison, handle, ensure_ascii=False, indent=2)
-        handle.write("\n")
-    print(json.dumps(comparison, indent=2, ensure_ascii=False))
+    config_entries = _parse_config_entries(args.configs)
+    comparison_payload = compare_planning_configs(
+        payload,
+        {name: path for name, path in config_entries},
+        source=str(args.input),
+    )
+    write_baseline_compare_artifact(args.output, comparison_payload)
+    print(json.dumps(comparison_payload, indent=2, ensure_ascii=False))
     return 0
 
 

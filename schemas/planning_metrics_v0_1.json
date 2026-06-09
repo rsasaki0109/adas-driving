@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adas-driving.local/schemas/planning_metrics_v0_1.json",
+  "title": "Planning offline metrics artifact v0.1",
+  "type": "object",
+  "required": ["schema_version", "metrics", "producer"],
+  "properties": {
+    "schema_version": {
+      "const": "planning_metrics.v0.1"
+    },
+    "source": {
+      "type": ["string", "null"]
+    },
+    "config": {
+      "type": ["string", "null"]
+    },
+    "config_hash": {
+      "type": ["string", "null"]
+    },
+    "producer": {
+      "type": "string"
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["frame_count"],
+      "properties": {
+        "frame_count": { "type": "integer", "minimum": 0 },
+        "target_path_valid_rate": { "type": "number" },
+        "behavior_output_rate": { "type": "number" },
+        "behavior_switch_count": { "type": "integer" },
+        "behavior_switch_count_per_min": { "type": "number" },
+        "warning_frame_rate": { "type": "number" },
+        "target_speed_output_rate": { "type": "number" },
+        "mean_confidence": { "type": "number" },
+        "behavior_counts": { "type": "object" },
+        "ego_speed_source_counts": { "type": "object" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

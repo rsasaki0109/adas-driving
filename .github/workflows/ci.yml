@@ -25,3 +25,16 @@ jobs:
           python scripts/eval_planning_scenarios.py \
             --scenarios-dir scenarios \
             --output outputs/ci_planning_scenarios.json
+      - name: Run planning baseline compare
+        run: |
+          python scripts/compare_planning_baselines.py \
+            --input examples/fixtures/planning_demo_perception.json \
+            --output outputs/ci_planning_baseline_compare.json \
+            --metrics-dir outputs/ci_planning_metrics
+      - name: Export planning benchmark tables
+        run: |
+          python scripts/export_planning_benchmark.py \
+            --compare-json outputs/ci_planning_baseline_compare.json \
+            --csv outputs/ci_planning_benchmark.csv \
+            --markdown outputs/ci_planning_benchmark.md \
+            --json outputs/ci_planning_benchmark_export.json

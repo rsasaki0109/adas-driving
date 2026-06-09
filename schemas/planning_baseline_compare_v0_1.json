@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adas-driving.local/schemas/planning_baseline_compare_v0_1.json",
+  "title": "Planning baseline compare artifact v0.1",
+  "type": "object",
+  "required": ["schema_version", "baseline", "configs"],
+  "properties": {
+    "schema_version": {
+      "const": "planning_baseline_compare.v0.1"
+    },
+    "source": {
+      "type": ["string", "null"]
+    },
+    "producer": {
+      "type": "string"
+    },
+    "baseline": {
+      "type": "string"
+    },
+    "configs": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["config_path", "config_hash", "metrics"],
+        "properties": {
+          "config_path": { "type": "string" },
+          "config_hash": { "type": "string" },
+          "metrics": { "type": "object" },
+          "metrics_artifact": { "type": "object" },
+          "sample_behaviors": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "deltas_vs_baseline": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "number" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

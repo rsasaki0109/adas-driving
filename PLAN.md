@@ -164,7 +164,7 @@ STOP_FOR_RED / YIELD_VRU
 |---|---|---|---|---|
 | Phase 0 | 1-2 weeks | `adas_planning` package, types, schema, adapter, lane target, lead follow, traffic light FSM, offline replay, overlay | saved perception JSON から PlanningResult を再生成できる。3 本以上の dashcam 動画で target path / behavior / warnings overlay が出る。lane missing / empty detections / traffic light flicker の unit test が通る | control, steering/brake command, ROS, CARLA, HD map, lane change, intersection turn, perception retraining |
 | Phase 1 | mostly done | pedestrian yield ✅, lane departure ✅, pseudo ego speed ✅, scenario YAML ✅, metrics/config compare CLI ✅, end-to-end demo ✅ | versioned metrics artifact ✅ (`planning_metrics.v0.1`) | QP/MPC, full Frenet, closed-loop simulation, actuator, safety claims |
-| Phase 2 | next | scenario corpus ✅, perturbation tests ✅, baseline planner compare, optional benchmark adapter | noise/ID switch/distance noise regression tests in CI ✅。planning JSON metrics artifact versioning 未 | FAD claims, HD map requirement, CARLA requirement, real-car operation, generic intersection planner |
+| Phase 2 | mostly done | scenario corpus ✅, perturbation tests ✅, baseline planner compare ✅, inference post-process ✅, benchmark adapter ✅ | baseline compare artifact ✅, metrics validation ✅, post-NMS sweep pipeline ✅, CSV/MD export ✅, driving_replay export ✅ | FAD claims, HD map requirement, CARLA requirement, real-car operation, generic intersection planner |
 
 ### First PR Split
 
@@ -282,6 +282,22 @@ I) **Planning Phase 1 (~2026-06-10 実装)**: ✅ end-to-end demo
    `adas_planning/metrics/scenario_eval.py`、perturbation regression tests、
    CI scenario gate、**pseudo ego speed** (`adas_planning/ego/pseudo_speed.py`)、
    versioned metrics artifact (`planning_metrics.v0.1`)。
+
+J) **Planning Phase 2 + inference-side (~2026-06-10)**: ✅ baseline planner compare
+   (`scripts/compare_planning_baselines.py`, `planning_baseline_compare.v0.1`)、
+   metrics artifact load/validate、post-fusion NMS (`adas_perception/postprocess.py`)、
+   presets `bdd100k_yolo_kind_tuned_*_post_nms.yaml`、
+   cached sweep `scripts/sweep_bdd100k_postprocess.py`、
+   bootstrap sweep pipeline `scripts/run_postprocess_sweep_pipeline.sh`、
+   benchmark adapter (`scripts/export_planning_benchmark.py`, CSV/MD/JSON export,
+   `scripts/export_driving_replay.py` → `driving_replay.v0.1`)。
+
+**Post-NMS bootstrap sweep (2026-06-10, yolov8n.pt, odd val 200 frames):**
+
+- raw cache-low macro F1 ≈ **0.208** (`outputs/bdd100k_yolo_bootstrap_cache_low_odd_report.json`)
+- best post-NMS combo macro F1 ≈ **0.217** (`outputs/postprocess_sweep_bootstrap/summary.json`)
+- 主な改善: vehicle F1 **0.556 → 0.592**（FP 1573 → 170 @ score 0.20 + NMS 0.45/0.35）
+- 注意: finetuned weight 未使用のため絶対値は参考。finetuned cache 上で再 sweep するのが本番。
 
 ### このセッションで入った主な変更 (2026-04-25 〜 26)
 
