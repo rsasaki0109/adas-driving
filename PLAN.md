@@ -1,6 +1,6 @@
 # PLAN
 
-Last updated: 2026-06-10 (Planning Phase 1 demo + scenarios)
+Last updated: 2026-06-10 (official train deferred; val mirror ready)
 
 `adas-perception` は、単眼カメラ画像/動画から車線、車両、歩行者、標識、信号候補を検出して可視化する、デモ重視のPython製ADAS認識OSSである。現在の主軸は認識だが、次の pivot では「perception JSON から driving-relevant な判断を安定して再生・可視化・比較できる planning overlay / planning JSON」を追加する。これは車両制御や安全性能を主張するスタックではなく、公開データ上で再現可能に改善していく研究・デモ・教育向けプロジェクトとして進める。
 
@@ -243,14 +243,16 @@ Minimum overlay:
 | online demo | `scripts/demo_image.py` / `scripts/demo_video.py` / `scripts/web_demo.py` |
 | README hero | `assets/demo_wbf7.gif` (Stockholm Pexels CC0、640x360 @ 10fps、5 MB) |
 
-### 主要ブロッカー (両方とも user-action 待ち)
+### 主要ブロッカー / 保留
 
-1. **官公 BDD100K train split 未配置** (~70k 画像 / ~7GB)。
-   配置すれば `bash scripts/run_bdd100k_official_train.sh` で export → 学習 →
-   eval → sweep → compare までワンコマンド。これが accuracy 続伸の唯一の道。
-2. **Jetson 実機未入手**。エッジデプロイ (TensorRT/INT8 / Web demo on Jetson)
-   は ROS 不要 + 数分インストールの軽量さで Autoware/OpenPilot と差別化できる
-   が、実機 FPS 計測が無いと裏取りできない。
+1. **官公 BDD100K train split** (~70k 画像 / ~7GB) — **当面スキップ (user 判断 2026-06-10)**。  
+   配置すれば `bash scripts/run_bdd100k_official_train.sh` で export → 学習 → eval まで一括。accuracy 続伸の本命だが今は着手しない。
+2. **Jetson 実機未入手** — エッジデプロイ実証は実機待ち。
+
+**ローカル準備済み (train なしでも使える):**
+
+- val mirror: `data/bdd100k/images/100k/val` (10,000) + `det_val.json` (`prepare_bdd100k.py --download-val`)
+- bootstrap: `scripts/bootstrap_bdd100k_official_train.sh` (train 未配置時は exit 2 で止まる)
 
 ### Codex が次にやるべきこと (優先順)
 
@@ -264,10 +266,8 @@ D) **CI / pytest (~30min)**: ✅ `tests/` に tracker/distance/traffic_light/lan
 
 E) **README hero MP4 化** (~10min): ✅ `assets/demo_wbf7.mp4` (804 KB) + poster、README リンク化
 
-F) **官公 train split が user 側で配置されたら**: `bash
-   scripts/run_bdd100k_official_train.sh` をそのまま走らせる。10 epoch で
-   約 4 時間 (GPU)。validation mirror 上の頭打ち (-0.005 macro from
-   plain retrain) を解消できる可能性がある。
+F) **官公 train split** — **deferred (当面スキップ)**。再開時: `RUN_TRAIN=1 bash
+   scripts/bootstrap_bdd100k_official_train.sh`
 
 G) **Jetson 実機が手に入ったら**: ONNX export → TensorRT engine (FP16/INT8)、
    軽量 config (640px no-TTA preset)、`scripts/web_demo.py` を実機で起動して

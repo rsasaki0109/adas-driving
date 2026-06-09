@@ -111,7 +111,7 @@ python scripts/evaluate_bdd100k.py \
   --output outputs/bdd100k_eval.json
 ```
 
-### 公式 train で再学習
+### 公式 train で再学習（任意・当面スキップ可）
 
 1. [BDD100K 公式](https://bdd-data.berkeley.edu/) から train 画像 + labels を取得
 2. 以下に配置:
