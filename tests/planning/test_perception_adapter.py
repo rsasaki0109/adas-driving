@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from adas_planning.io.perception_adapter import adapt_perception_document
+from adas_planning.io.perception_adapter import adapt_perception_document, adapt_perception_frame
 from adas_planning.io.planning_json import planning_result_from_dict, planning_result_to_dict
 from adas_planning.types import Behavior
 
@@ -79,3 +79,16 @@ def test_planning_json_round_trip():
     assert restored.frame_id == 1
     assert restored.behavior == Behavior.KEEP_LANE
     assert restored.target_path_px == [(640, 700), (640, 500)]
+
+
+def test_adapt_perception_frame_from_video_frame_dict():
+    frame = {
+        "frame_index": 4,
+        "timestamp_ms": 133.3,
+        "lanes": {"lines": [], "polygon": []},
+        "detections": [],
+    }
+    planning_input = adapt_perception_frame(frame, image_width=1280, image_height=720, fps=30.0)
+    assert planning_input.frame_id == 4
+    assert planning_input.timestamp_s == 0.1333
+    assert planning_input.image_width == 1280

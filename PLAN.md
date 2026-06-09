@@ -286,13 +286,14 @@ I) **Planning Phase 1 (~2026-06-10 実装)**: ✅ end-to-end demo
 J) **Planning Phase 2 + inference-side (~2026-06-10)**: ✅ baseline planner compare
    (`scripts/compare_planning_baselines.py`, `planning_baseline_compare.v0.1`)、
    metrics artifact load/validate、post-fusion NMS (`adas_perception/postprocess.py`)、
-   presets `bdd100k_yolo_kind_tuned_*_post_nms.yaml`、
+   presets `bdd100k_yolo_kind_tuned_*_post_nms.yaml`（production sweep best 反映）、
    cached sweep `scripts/sweep_bdd100k_postprocess.py`、
    bootstrap sweep pipeline `scripts/run_postprocess_sweep_pipeline.sh`、
    benchmark adapter (`scripts/export_planning_benchmark.py`, CSV/MD/JSON export,
    `scripts/export_driving_replay.py` → `driving_replay.v0.1`)、
    E2E demo (`scripts/run_planning_demo.py` → planning overlay + driving_replay +
-   optional `--run-perception` / `--compare-configs` / `--export-benchmark`)。
+   optional `--run-perception` / `--compare-configs` / `--export-benchmark`)、
+   web demo planning overlay (`scripts/web_demo.py` — optional planning HUD)。
 
 **Post-NMS production sweep (2026-06-10, odd 5,000 report split):**
 

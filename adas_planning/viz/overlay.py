@@ -30,7 +30,7 @@ def draw_planning_overlay(
     overlay_cfg = config.get("overlay", {})
     vis = frame_bgr.copy()
 
-    if perception_frame:
+    if perception_frame and bool(overlay_cfg.get("draw_lane_context", True)):
         _draw_lane_context(vis, perception_frame)
 
     if planning_result.target_path_px:

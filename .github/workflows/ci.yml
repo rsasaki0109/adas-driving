@@ -45,3 +45,6 @@ jobs:
             --max-frames 5 \
             --compare-configs \
             --export-benchmark
+      - name: Run web demo planning render smoke
+        run: |
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest -q tests/test_web_demo_planning.py

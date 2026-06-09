@@ -65,6 +65,7 @@ python scripts/demo_video.py \
 |---|---|---|
 | 精度優先 (online WBF) | `configs/bdd100k_yolo_wbf7_perkind_iou_online.yaml` | 0.6763 |
 | 単一 config + TTA | `configs/bdd100k_yolo_finetuned_all_tuned_split_img1024_kind_tuned_tta_tuned_tiny.yaml` | 0.6389 |
+| 高速 demo + post-NMS | `configs/bdd100k_yolo_kind_tuned_post_nms.yaml` | +0.0014 vs kind-only (proxy sweep) |
 | 高速 demo | `configs/bdd100k_yolo_finetuned_all_tuned_split_img1024_kind_tuned.yaml` | 0.6355 |
 
 重み `outputs/models/adas_yolov8n_bdd100k.pt` はローカル配置が必要です（git 非追跡）。
@@ -75,6 +76,9 @@ python scripts/demo_video.py \
 pip install gradio
 python scripts/web_demo.py
 ```
+
+ブラウザ UI から画像/動画をアップロードして認識結果を確認できます。**Enable planning overlay** を ON にすると
+target path / behavior / warnings も重ねて表示します（research/demo 用途のみ）。
 
 ### Planning overlay
 
@@ -101,6 +105,16 @@ python scripts/run_planning_demo.py \
 ```
 
 **finetuned 重みあり** (`outputs/models/adas_yolov8n_bdd100k.pt` 配置済み):
+
+```bash
+python scripts/run_planning_demo.py \
+  --run-perception \
+  --perception-config configs/bdd100k_yolo_kind_tuned_post_nms.yaml \
+  --video assets/demo_wbf7.mp4 \
+  --output-dir outputs/planning_demo_post_nms
+```
+
+精度最優先 (WBF 7-way、重い):
 
 ```bash
 python scripts/run_planning_demo.py \

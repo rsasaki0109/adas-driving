@@ -1,5 +1,6 @@
-# No-TTA inference-side preset with per-kind post-fusion NMS. Faster than TTA variants;
-# sweep post-NMS IoU on cached predictions before committing to online eval.
+# No-TTA inference-side preset with per-kind post-fusion NMS. Faster than TTA variants.
+# Thresholds/NMS IoU match outputs/postprocess_sweep_production (odd 5,000, +0.0014 macro F1
+# vs kind-threshold-only on the proxy bootstrap weight; re-run sweep after placing canonical weight).
 objects:
   enabled: true
   backend: ultralytics
@@ -7,7 +8,7 @@ objects:
   device: auto
   image_size: 1024
   augment: false
-  score_threshold: 0.15
+  score_threshold: 0.20
   score_thresholds_by_kind:
     pedestrian: 0.20
     vehicle: 0.25
@@ -34,10 +35,10 @@ objects:
     enabled: true
     nms:
       enabled: true
-      default_iou: 0.50
+      default_iou: 0.45
       iou_by_kind:
         pedestrian: 0.45
-        traffic_light: 0.40
+        traffic_light: 0.35
         traffic_sign: 0.40
         vehicle: 0.50
     min_area_ratio_by_kind:

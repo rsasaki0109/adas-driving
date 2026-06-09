@@ -8,6 +8,23 @@ from adas_planning.types import DetectionInput, LaneInput, PlanningInput, PointP
 VRU_KINDS = {"pedestrian", "cyclist", "bicycle", "motorcycle", "rider"}
 
 
+def adapt_perception_frame(
+    frame: dict[str, Any],
+    *,
+    image_width: int,
+    image_height: int,
+    fps: float = 30.0,
+    schema_version: str = "perception.v0.1",
+) -> PlanningInput:
+    return _adapt_frame(
+        frame,
+        default_width=image_width,
+        default_height=image_height,
+        fps=fps,
+        schema_version=schema_version,
+    )
+
+
 def adapt_perception_document(payload: dict[str, Any]) -> list[PlanningInput]:
     if "frames" in payload:
         image_width = int(payload.get("video", {}).get("width", 0))
