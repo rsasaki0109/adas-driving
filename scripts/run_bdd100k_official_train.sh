@@ -26,6 +26,8 @@ TRAIN_IMG_DIR="data/bdd100k/images/100k/train"
 TRAIN_LABELS="data/bdd100k/labels/det_20/det_train.json"
 VAL_IMG_DIR="data/bdd100k/images/100k/val"
 VAL_LABELS="data/bdd100k/labels/det_20/det_val.json"
+BASE_WEIGHT="outputs/models/adas_yolov8n_bdd100k.pt"
+FALLBACK_WEIGHT="yolov8n.pt"
 
 EXPORT_DIR="data/bdd100k_yolo_adas_objects_official_train_val"
 RUN_NAME="adas_yolov8n_bdd100k_official_train_${EPOCHS}ep_1024"
@@ -68,10 +70,15 @@ step "Step 2: export YOLO-format dataset (official train + val)"
   --classes car truck bus bicycle motorcycle train pedestrian rider "traffic sign" "traffic light" \
   --clear-output
 
-step "Step 3: train YOLOv8n 1024px ${EPOCHS}ep from outputs/models/adas_yolov8n_bdd100k.pt"
+step "Step 3: train YOLOv8n 1024px ${EPOCHS}ep from ${BASE_WEIGHT:-$FALLBACK_WEIGHT}"
+if [[ ! -f "$BASE_WEIGHT" ]]; then
+  echo "WARNING: Missing $BASE_WEIGHT; bootstrapping Ultralytics $FALLBACK_WEIGHT for official-train fine-tune."
+  "$PY" -c "from ultralytics import YOLO; YOLO('${FALLBACK_WEIGHT}')"
+  BASE_WEIGHT="$FALLBACK_WEIGHT"
+fi
 "$PY" - <<PYEOF
 from ultralytics import YOLO
-YOLO("outputs/models/adas_yolov8n_bdd100k.pt").train(
+YOLO("${BASE_WEIGHT}").train(
     data="${EXPORT_DIR}/dataset.yaml",
     epochs=${EPOCHS},
     imgsz=1024,
