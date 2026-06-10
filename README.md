@@ -14,7 +14,10 @@ pip install -U pip && pip install -r requirements.txt -r requirements-yolo.txt
 python scripts/demo_video.py --input path/to/drive.mp4 --output outputs/drive_adas.mp4
 ```
 
-[![Demo](assets/demo_wbf7_poster.png)](assets/demo_wbf7.mp4)
+![Demo](assets/demo_hero.gif)
+
+*Detection + lanes + Kalman tracking + monocular distance + traffic light state + rule-based planning overlay,
+from a single dashcam clip ([full clip](assets/demo_hero.mp4), config: `configs/demo_video_full.yaml`).*
 
 ---
 
@@ -63,6 +66,7 @@ python scripts/demo_video.py \
 
 | Use case | config | macro F1 reference |
 |---|---|---|
+| Full demo stack (detection + lanes + tracking + distance + TL state; hero GIF above) | `configs/demo_video_full.yaml` | — |
 | Accuracy priority (online WBF) | `configs/bdd100k_yolo_wbf7_perkind_iou_online.yaml` | 0.6763 |
 | Single config + TTA | `configs/bdd100k_yolo_finetuned_all_tuned_split_img1024_kind_tuned_tta_tuned_tiny.yaml` | 0.6389 |
 | Fast demo + post-NMS | `configs/bdd100k_yolo_kind_tuned_post_nms.yaml` | +0.0014 vs kind-only (proxy sweep) |
