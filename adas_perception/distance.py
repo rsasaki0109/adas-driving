@@ -19,6 +19,16 @@ class MonocularDistanceEstimator:
       2. `focal_length_px` (direct override; treated as fy)
       3. `horizontal_fov_degrees` (default fallback; computes f_x from
          image width and assumes square pixels so f_y == f_x)
+
+    When `camera_height_m` is set and the bbox bottom projects onto the
+    ground plane, the height-based distance is fused with the ground-plane
+    depth Z. The two methods fail differently: the height method depends on
+    the assumed object size (high variance per instance), the ground method
+    on pixel quantization near the horizon (blows up far away). The fusion
+    weight for the ground depth therefore ramps up with the bbox bottom's
+    pixel distance below the horizon (`ground_fusion.full_weight_px`,
+    capped at `ground_fusion.max_weight`). Without `camera_height_m` the
+    behavior is unchanged.
     """
 
     def __init__(self, config: dict[str, Any]):
@@ -31,6 +41,14 @@ class MonocularDistanceEstimator:
         self.intrinsics_cx = intrinsics.get("cx")
         self.intrinsics_cy = intrinsics.get("cy")
         self.camera_height_m = config.get("camera_height_m")
+        ground_fusion = config.get("ground_fusion") or {}
+        self.ground_fusion_enabled = bool(ground_fusion.get("enabled", True))
+        self.ground_fusion_full_weight_px = max(
+            1.0, float(ground_fusion.get("full_weight_px", 80.0))
+        )
+        self.ground_fusion_max_weight = min(
+            1.0, max(0.0, float(ground_fusion.get("max_weight", 0.7)))
+        )
         self.min_box_height_px = int(config.get("min_box_height_px", 12))
         self.max_distance_m = float(config.get("max_distance_m", 120.0))
         self.object_heights_m = {
@@ -75,10 +93,32 @@ class MonocularDistanceEstimator:
             ground_position = self._ground_position(
                 detection.box, fx=fx, fy=focal_px, cx=cx, cy=cy, camera_height_m=camera_height_m
             )
+            distance_m = self._fuse_ground_distance(
+                distance_m, ground_position, box=detection.box, cy=cy
+            )
             output.append(
                 replace(detection, distance_m=distance_m, ground_position_m=ground_position)
             )
         return output
+
+    def _fuse_ground_distance(
+        self,
+        height_distance_m: float,
+        ground_position: tuple[float, float] | None,
+        *,
+        box: Box,
+        cy: float,
+    ) -> float:
+        if not self.ground_fusion_enabled or ground_position is None:
+            return height_distance_m
+        ground_z_m = ground_position[1]
+        delta_y = float(box.y2) - cy  # > 0 whenever ground_position is not None
+        weight = (
+            min(1.0, delta_y / self.ground_fusion_full_weight_px)
+            * self.ground_fusion_max_weight
+        )
+        fused = weight * ground_z_m + (1.0 - weight) * height_distance_m
+        return min(fused, self.max_distance_m)
 
     def _ground_position(
         self,
