@@ -2,6 +2,7 @@
 
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Tests](https://img.shields.io/badge/tests-pytest-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 A lightweight Python ADAS demo that detects **lanes, road users, traffic signs, and traffic lights** from a monocular dashcam and renders the results as JSON / video overlays.
 A **rule-based planning overlay** can also be replayed from saved perception JSON.
@@ -256,4 +257,6 @@ python scripts/eval_planning_scenarios.py --scenarios-dir scenarios --output out
 
 ## License / data
 
-When using BDD100K, follow the [official license](https://bdd-data.berkeley.edu/). Demo video footage: [Pexels CC0](https://www.pexels.com/video/dash-cam-view-of-the-road-5921059/).
+Code is [MIT licensed](LICENSE). When using BDD100K, follow the [official license](https://bdd-data.berkeley.edu/).
+Demo video footage: [Pexels CC0](https://www.pexels.com/video/dash-cam-view-of-the-road-5921059/).
+Lane weights: [TwinLiteNet](https://github.com/chequanghuy/TwinLiteNet) (MIT).

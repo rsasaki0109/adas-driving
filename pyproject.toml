@@ -7,6 +7,7 @@ name = "adas-perception"
 version = "0.1.0"
 description = "Minimal camera-based ADAS perception demo with lane, object, sign, and visualization outputs."
 readme = "README.md"
+license = {file = "LICENSE"}
 requires-python = ">=3.10"
 dependencies = [
   "torch>=2.1",
