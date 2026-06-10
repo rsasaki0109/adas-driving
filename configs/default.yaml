@@ -80,6 +80,13 @@ traffic_lights:
       - lower: [40, 70, 90]
         upper: [85, 255, 255]
 
+traffic_light_state:
+  enabled: true
+  # Trained crop classifier (scripts/train_traffic_light_classifier.py).
+  # Falls back to HSV automatically when the model file is absent.
+  method: onnx
+  onnx_model: outputs/models/traffic_light_state.onnx
+
 lane_smoothing:
   enabled: true
   alpha: 0.65

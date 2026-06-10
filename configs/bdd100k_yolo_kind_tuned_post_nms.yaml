@@ -51,6 +51,13 @@ signs:
 traffic_lights:
   enabled: false
 
+traffic_light_state:
+  enabled: true
+  # Trained crop classifier (scripts/train_traffic_light_classifier.py).
+  # Falls back to HSV automatically when the model file is absent.
+  method: onnx
+  onnx_model: outputs/models/traffic_light_state.onnx
+
 lane_smoothing:
   enabled: false
 

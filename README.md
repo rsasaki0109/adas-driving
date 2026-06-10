@@ -214,6 +214,7 @@ If `adas_yolov8n_bdd100k.pt` is missing, fine-tuning starts from `yolov8n.pt`.
 | `scripts/evaluate_lane.py` | Lane detector comparison |
 | `scripts/benchmark.py` | FPS / latency measurement |
 | `scripts/export_yolo_onnx.py` | YOLO → ONNX export (for Jetson) |
+| `scripts/train_traffic_light_classifier.py` | Train traffic light state classifier (BDD100K val mirror) |
 | `scripts/prepare_bdd100k.py` | Data placement / validation |
 
 ---

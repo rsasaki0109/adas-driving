@@ -26,6 +26,29 @@ def test_traffic_light_classifier_detects_red():
     assert results[0].state == "red"
 
 
+def test_onnx_method_falls_back_to_hsv_when_model_missing():
+    frame = _frame_with_color((0, 0, 220))
+    classifier = TrafficLightStateClassifier(
+        {
+            "enabled": True,
+            "min_box_pixels": 16,
+            "method": "onnx",
+            "onnx_model": "outputs/models/does_not_exist.onnx",
+        }
+    )
+    detection = Detection(
+        kind="traffic_light",
+        label="traffic light",
+        confidence=0.9,
+        box=Box(x1=120, y1=40, x2=200, y2=200),
+        source="test",
+    )
+    results = classifier.classify(frame, [detection])
+    assert results[0].state == "red"  # HSV fallback still classifies
+    # Second call must not retry the failed load path differently.
+    assert classifier.classify(frame, [detection])[0].state == "red"
+
+
 def test_traffic_light_classifier_skips_non_traffic_light():
     frame = _frame_with_color((0, 220, 0))
     classifier = TrafficLightStateClassifier({"enabled": True})

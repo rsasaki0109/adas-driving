@@ -2372,9 +2372,24 @@ official train 待ちで止まっているのは「YOLO の検出精度」だけ
 3. **VRU yield の TTC 化** — TrackHistory を vru_yield にも接続し、接近率から TTC を計算。
    TTC 閾値での警告と speed cap 強化を追加する。relative velocity は直近 2 サンプル差分から
    履歴全体の最小二乗フィットに置き換え (lead_follow の TTC 安定化にも効く)。
-4. **traffic light state の学習分類器** (別枠・要学習時間) — BDD100K det ラベルの
-   `trafficLightColor` 属性を使い、val mirror の even split で crop 分類器を学習、
-   odd split で HSV 法と比較評価する。official train 不要で数字を動かせる残り弾。
+4. **traffic light state の学習分類器** — **実施済み (2026-06-11)**。BDD100K det ラベルの
+   `trafficLightColor` 属性を使い、val mirror の even split (13,481 crops) で tiny CNN
+   (3 conv block + GAP、入力 32x64 BGR、class-weighted CE、flip/brightness augment、15 epoch)
+   を学習、odd split (12,602 crops、GT box・area>=64px) で HSV 法と比較した。
+   `scripts/train_traffic_light_classifier.py` が crop cache 構築 → 学習 → ONNX export →
+   比較評価まで一括実行する。結果 (odd split):
+
+   | method | accuracy | macro F1 | red F1 | yellow F1 | green F1 | off F1 |
+   |---|---|---|---|---|---|---|
+   | tiny CNN (ONNX) | **0.846** | **0.715** | 0.824 | 0.270 | 0.925 | 0.841 |
+   | HSV baseline | 0.721 | 0.600 | 0.829 | 0.116 | 0.859 | 0.597 |
+
+   accuracy +12.5pt / macro F1 +11.5pt。特に green (+0.066) と off (+0.244、夜間・逆光・
+   消灯の誤判定減) が改善。yellow は学習データ 250 box 程度で頭打ち (official train 待ち)。
+   `TrafficLightStateClassifier` に `method: onnx` を追加し、`configs/default.yaml` と
+   post-NMS demo preset で有効化済み (モデル未配置時は HSV に自動フォールバック)。
+   モデル: `outputs/models/traffic_light_state.{pt,onnx}` (git 非追跡)、
+   評価 JSON: `outputs/tl_state_eval.json`。
 
 将来枠 (今回はやらない): 車線の鳥瞰 RANSAC / CULane 系 ONNX、消失点からの地平線自動推定、
 IDM ベースの lead follow speed プロファイル、シナリオ拡充 (夜間・黄信号・割り込み) + comfort 指標。
