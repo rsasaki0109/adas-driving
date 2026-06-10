@@ -19,6 +19,7 @@ from adas_perception.postprocess import apply_postprocess, build_post_process_co
 from adas_perception.tracking import SimpleTracker
 from adas_perception.traffic_light_state import TrafficLightStateClassifier
 from adas_perception.types import Box, Detection, LaneResult, PerceptionResult
+from adas_perception.weights import ensure_config_weights
 
 
 class ADASPerceptionPipeline:
@@ -26,6 +27,11 @@ class ADASPerceptionPipeline:
 
     def __init__(self, config: dict[str, Any]):
         self.config = config
+        # Fetch any known-but-missing model files referenced by the config
+        # (GitHub Release assets / upstream repos) so a fresh clone can run
+        # demos without manual weight placement. Best-effort: failures fall
+        # through to each component's own missing-model handling.
+        ensure_config_weights(config)
         lane_config = config.get("lane", {}) or {}
         self.lane_detector = (
             create_lane_detector(lane_config) if lane_config.get("enabled", True) else None

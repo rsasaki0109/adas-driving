@@ -1,0 +1,122 @@
+# Full-stack video demo preset: post-NMS finetuned detection + TwinLiteNet
+# lanes + Kalman tracking + ground-fused distance + trained traffic light
+# state classifier. This is the recommended config for demo/hero footage;
+# planning demos get track_id / distance_m / state from it.
+#
+# Required local models (all auto-fallback or documented):
+#   outputs/models/adas_yolov8n_bdd100k.pt        (finetuned detector)
+#   outputs/models/twinlitenet_lane.onnx           (lane; CV fallback if absent)
+#   outputs/models/traffic_light_state.onnx        (TL state; HSV fallback if absent)
+objects:
+  enabled: true
+  backend: ultralytics
+  model: outputs/models/adas_yolov8n_bdd100k.pt
+  device: auto
+  image_size: 1024
+  augment: false
+  score_threshold: 0.20
+  score_thresholds_by_kind:
+    pedestrian: 0.20
+    vehicle: 0.25
+    traffic_sign: 0.25
+    traffic_light: 0.20
+  iou_threshold: 0.50
+  max_detections: 240
+  class_groups:
+    pedestrian:
+      - pedestrian
+      - rider
+    vehicle:
+      - bicycle
+      - bus
+      - car
+      - motorcycle
+      - train
+      - truck
+    traffic_sign:
+      - traffic sign
+    traffic_light:
+      - traffic light
+  post_process:
+    enabled: true
+    nms:
+      enabled: true
+      default_iou: 0.45
+      iou_by_kind:
+        pedestrian: 0.45
+        traffic_light: 0.35
+        traffic_sign: 0.40
+        vehicle: 0.50
+    min_area_ratio_by_kind:
+      traffic_light: 0.00008
+      traffic_sign: 0.00008
+
+signs:
+  enabled: false
+
+traffic_lights:
+  enabled: false
+
+traffic_light_state:
+  enabled: true
+  method: onnx
+  onnx_model: outputs/models/traffic_light_state.onnx
+
+lane:
+  enabled: true
+  backend: segmentation
+  color_mask:
+    enabled: true
+    dilate_iterations: 2
+  polynomial_fit:
+    enabled: true
+    min_points: 6
+    polyline_samples: 12
+  segmentation:
+    model_path: outputs/models/twinlitenet_lane.onnx
+    input_size: [360, 640]
+    output_name: ll
+    lane_channel: 1
+    lane_threshold: 0.5
+    min_blob_pixels: 200
+    polyline_samples: 20
+    input_layout: NCHW
+    normalize:
+      mean: [0.0, 0.0, 0.0]
+      std: [1.0, 1.0, 1.0]
+      scale: 255.0
+
+lane_smoothing:
+  enabled: true
+  alpha: 0.65
+  max_missed: 3
+
+tracking:
+  enabled: true
+  motion_model: kalman
+  two_stage: true
+  centroid_distance_fraction: 0.6
+  kinds:
+    - vehicle
+    - pedestrian
+    - traffic_light
+    - traffic_sign
+
+distance_estimation:
+  enabled: true
+  # Approximate intrinsics + camera height for a typical 1920x1080 dashcam.
+  # camera_height_m enables ground-plane projection and ground-fused distance.
+  intrinsics:
+    fx: 1500.0
+    fy: 1500.0
+    cx: 960.0
+    cy: 540.0
+  camera_height_m: 1.4
+
+visualization:
+  show_summary: true
+  label_style: compact
+  min_confidence: 0.30
+  avoid_label_overlap: true
+  distance_format: rounded
+  show_ground_position: false

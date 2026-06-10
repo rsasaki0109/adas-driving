@@ -68,7 +68,9 @@ python scripts/demo_video.py \
 | Fast demo + post-NMS | `configs/bdd100k_yolo_kind_tuned_post_nms.yaml` | +0.0014 vs kind-only (proxy sweep) |
 | Fast demo | `configs/bdd100k_yolo_finetuned_all_tuned_split_img1024_kind_tuned.yaml` | 0.6355 |
 
-The weights `outputs/models/adas_yolov8n_bdd100k.pt` must be placed locally (not tracked by git).
+Model weights download automatically on first run (GitHub Release assets / upstream repos, sha256-pinned)
+into `outputs/models/` — no manual placement needed. To fetch them ahead of time or offline-copy them,
+see `adas_perception/weights.py` for the exact URLs.
 
 ### Web demo
 
@@ -94,7 +96,7 @@ python scripts/run_planning_demo.py \
 
 Outputs: `planning_frames.json`, `planning_overlay.mp4`, `driving_replay.json` (perception + planning combined)
 
-**Perception → planning in one shot from a video** (with `outputs/models/adas_yolov8n_bdd100k.pt` in place; the post-NMS preset is the default):
+**Perception → planning in one shot from a video** (weights auto-download; the post-NMS preset is the default):
 
 ```bash
 python scripts/run_planning_demo.py \
