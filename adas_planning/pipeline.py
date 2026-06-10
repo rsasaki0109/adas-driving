@@ -35,7 +35,7 @@ class PlanningPipeline:
 
         proposals = [
             compute_traffic_light(planning_input, self.config, self.traffic_light_fsm),
-            compute_vru_yield(planning_input, self.config),
+            compute_vru_yield(planning_input, self.config, self.track_history),
             compute_lead_follow(planning_input, self.config, self.track_history),
             self.lane_departure.compute(planning_input, self.config),
         ]

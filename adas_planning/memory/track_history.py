@@ -45,17 +45,33 @@ class TrackHistory:
             del samples[: len(samples) - self.max_history]
 
     def relative_velocity_mps(self, track_id: int | None) -> float | None:
+        """Least-squares slope of distance over the whole history window.
+
+        Using every sample instead of only the last two smooths out
+        single-frame distance noise, which otherwise dominates TTC.
+        """
         if track_id is None:
             return None
-        samples = self._history.get(track_id) or []
+        samples = [
+            sample
+            for sample in (self._history.get(track_id) or [])
+            if sample.distance_m is not None
+        ]
         if len(samples) < 2:
             return None
-        first = samples[-2]
-        last = samples[-1]
-        dt = last.timestamp_s - first.timestamp_s
-        if dt <= 1e-3 or first.distance_m is None or last.distance_m is None:
+        t0 = samples[0].timestamp_s
+        times = [sample.timestamp_s - t0 for sample in samples]
+        distances = [float(sample.distance_m) for sample in samples]
+        count = len(samples)
+        mean_t = sum(times) / count
+        mean_d = sum(distances) / count
+        variance = sum((t - mean_t) ** 2 for t in times)
+        if variance <= 1e-6:
             return None
-        return (last.distance_m - first.distance_m) / dt
+        covariance = sum(
+            (t - mean_t) * (d - mean_d) for t, d in zip(times, distances)
+        )
+        return covariance / variance
 
     def reset_track(self, track_id: int) -> None:
         self._history.pop(track_id, None)
