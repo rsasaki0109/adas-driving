@@ -1,0 +1,20 @@
+# BDD100K official-train YOLO dataset (Kaggle mirror a7madmostafa/bdd100k-yolo).
+# Class indices follow the mirror's label files; names are renamed to the
+# det_20-style names used by this repo's class_groups (person->pedestrian,
+# bike->bicycle, motor->motorcycle).
+path: adas-driving/data/bdd100k_yolo_kaggle
+train: train/images
+val: val/images
+
+nc: 10
+names:
+  - pedestrian
+  - rider
+  - car
+  - bus
+  - truck
+  - bicycle
+  - motorcycle
+  - traffic light
+  - traffic sign
+  - train
