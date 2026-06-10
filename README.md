@@ -3,10 +3,10 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Tests](https://img.shields.io/badge/tests-pytest-brightgreen)
 
-単眼 dashcam から **車線・物体・標識・信号** を検出し、JSON / 動画 overlay で見せる軽量 Python ADAS デモ。  
-保存済み perception JSON から **rule-based planning overlay** も再実行できます。
+A lightweight Python ADAS demo that detects **lanes, road users, traffic signs, and traffic lights** from a monocular dashcam and renders the results as JSON / video overlays.
+A **rule-based planning overlay** can also be replayed from saved perception JSON.
 
-**研究・デモ・教育向け** — 車両制御・安全性能保証用途ではありません。
+**For research, demos, and education** — not for vehicle control or safety-critical use.
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
@@ -18,39 +18,39 @@ python scripts/demo_video.py --input path/to/drive.mp4 --output outputs/drive_ad
 
 ---
 
-## できること（概要）
+## What it does
 
-| 領域 | 内容 |
+| Area | Contents |
 |---|---|
-| Perception | YOLO 物体検出、車線 (OpenCV / ONNX)、tracker、単眼距離、信号 state |
-| Planning | lane target、lead follow、信号 stop/go、VRU yield、lane departure warning |
-| 評価 | BDD100K macro F1、WBF 融合、scenario YAML、pytest |
+| Perception | YOLO object detection, lanes (OpenCV / ONNX), tracker, monocular distance, traffic light state |
+| Planning | lane target, lead follow, traffic light stop/go, VRU yield, lane departure warning |
+| Evaluation | BDD100K macro F1, WBF fusion, scenario YAML, pytest |
 
-BDD100K odd 5,000 での macro F1 目安: **0.6355** (高速) → **0.6763** (7-way WBF online)。  
-詳細な実験記録・採用判断は [PLAN.md](PLAN.md)、方向性は [ROADMAP.md](ROADMAP.md)。
+Macro F1 reference on BDD100K odd 5,000: **0.6355** (fast) → **0.6763** (7-way WBF online).
+Detailed experiment logs and adoption decisions live in [PLAN.md](PLAN.md), direction in [ROADMAP.md](ROADMAP.md).
 
 ![WBF ladder](assets/wbf_ladder.png)
 
 ---
 
-## セットアップ
+## Setup
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -U pip
 pip install -r requirements.txt -r requirements-yolo.txt
-pip install -e ".[dev]"          # pytest 用
-pip install -r requirements-bdd100k.txt   # BDD100K 評価・export 用（任意）
+pip install -e ".[dev]"          # for pytest
+pip install -r requirements-bdd100k.txt   # for BDD100K evaluation / export (optional)
 ```
 
-CUDA 利用時は環境に合う PyTorch を先に入れてから上記を実行してください。
+For CUDA, install a PyTorch build matching your environment first, then run the above.
 
 ---
 
-## クイックスタート
+## Quick start
 
-### 動画デモ（デフォルト）
+### Video demo (default)
 
 ```bash
 python scripts/demo_video.py \
@@ -59,30 +59,30 @@ python scripts/demo_video.py \
   --json-output outputs/drive.json
 ```
 
-### 精度優先 / 高速デモ
+### Accuracy-priority / fast demo
 
-| 用途 | config | macro F1 目安 |
+| Use case | config | macro F1 reference |
 |---|---|---|
-| 精度優先 (online WBF) | `configs/bdd100k_yolo_wbf7_perkind_iou_online.yaml` | 0.6763 |
-| 単一 config + TTA | `configs/bdd100k_yolo_finetuned_all_tuned_split_img1024_kind_tuned_tta_tuned_tiny.yaml` | 0.6389 |
-| 高速 demo + post-NMS | `configs/bdd100k_yolo_kind_tuned_post_nms.yaml` | +0.0014 vs kind-only (proxy sweep) |
-| 高速 demo | `configs/bdd100k_yolo_finetuned_all_tuned_split_img1024_kind_tuned.yaml` | 0.6355 |
+| Accuracy priority (online WBF) | `configs/bdd100k_yolo_wbf7_perkind_iou_online.yaml` | 0.6763 |
+| Single config + TTA | `configs/bdd100k_yolo_finetuned_all_tuned_split_img1024_kind_tuned_tta_tuned_tiny.yaml` | 0.6389 |
+| Fast demo + post-NMS | `configs/bdd100k_yolo_kind_tuned_post_nms.yaml` | +0.0014 vs kind-only (proxy sweep) |
+| Fast demo | `configs/bdd100k_yolo_finetuned_all_tuned_split_img1024_kind_tuned.yaml` | 0.6355 |
 
-重み `outputs/models/adas_yolov8n_bdd100k.pt` はローカル配置が必要です（git 非追跡）。
+The weights `outputs/models/adas_yolov8n_bdd100k.pt` must be placed locally (not tracked by git).
 
-### Web デモ
+### Web demo
 
 ```bash
 pip install gradio
 python scripts/web_demo.py
 ```
 
-ブラウザ UI から画像/動画をアップロードして認識結果を確認できます。**Enable planning overlay** を ON にすると
-target path / behavior / warnings も重ねて表示します（research/demo 用途のみ）。
+Upload images/videos from the browser UI to inspect detection results. Turning **Enable planning overlay** ON
+also renders target path / behavior / warnings (research/demo use only).
 
 ### Planning overlay
 
-**クイックデモ** (同梱 fixture、GPU 重み不要):
+**Quick demo** (bundled fixture, no GPU weights required):
 
 ```bash
 python scripts/run_planning_demo.py \
@@ -92,9 +92,9 @@ python scripts/run_planning_demo.py \
   --export-benchmark
 ```
 
-出力: `planning_frames.json`, `planning_overlay.mp4`, `driving_replay.json` (perception + planning 統合)
+Outputs: `planning_frames.json`, `planning_overlay.mp4`, `driving_replay.json` (perception + planning combined)
 
-**動画から perception → planning まで一括** (`outputs/models/adas_yolov8n_bdd100k.pt` 配置済み、post-NMS preset がデフォルト):
+**Perception → planning in one shot from a video** (with `outputs/models/adas_yolov8n_bdd100k.pt` in place; the post-NMS preset is the default):
 
 ```bash
 python scripts/run_planning_demo.py \
@@ -104,7 +104,7 @@ python scripts/run_planning_demo.py \
   --output-dir outputs/planning_demo_live
 ```
 
-追加重み不要の torchvision baseline に戻す場合:
+To fall back to the torchvision baseline that needs no extra weights:
 
 ```bash
 python scripts/run_planning_demo.py \
@@ -114,7 +114,7 @@ python scripts/run_planning_demo.py \
   --output-dir outputs/planning_demo_torchvision
 ```
 
-**finetuned 1024px (post-NMS 明示)**:
+**Finetuned 1024px (post-NMS explicit)**:
 
 ```bash
 python scripts/run_planning_demo.py \
@@ -124,7 +124,7 @@ python scripts/run_planning_demo.py \
   --output-dir outputs/planning_demo_post_nms
 ```
 
-精度最優先 (WBF 7-way、重い):
+Maximum accuracy (WBF 7-way, heavy):
 
 ```bash
 python scripts/run_planning_demo.py \
@@ -134,12 +134,12 @@ python scripts/run_planning_demo.py \
   --output-dir outputs/planning_demo_wbf7
 ```
 
-設定: `configs/planning/default.yaml` / `conservative.yaml` / `aggressive_demo.yaml`  
-scenario 評価: `python scripts/eval_planning_scenarios.py --scenarios-dir scenarios --output outputs/scenarios.json`
+Configs: `configs/planning/default.yaml` / `conservative.yaml` / `aggressive_demo.yaml`
+Scenario evaluation: `python scripts/eval_planning_scenarios.py --scenarios-dir scenarios --output outputs/scenarios.json`
 
 ### Jetson / ONNX export
 
-dev マシンで ONNX を書き出し、Jetson 実機で TensorRT 化する前提の軽量 preset です。
+A lightweight preset that assumes exporting ONNX on a dev machine and building TensorRT on a Jetson device.
 
 ```bash
 pip install -e ".[yolo]"
@@ -150,7 +150,7 @@ python scripts/benchmark.py \
   --max-frames 60
 ```
 
-Jetson 側の例:
+Example on the Jetson side:
 
 ```bash
 trtexec --onnx=outputs/models/adas_yolov8n_bdd100k_640.onnx \
@@ -159,15 +159,15 @@ trtexec --onnx=outputs/models/adas_yolov8n_bdd100k_640.onnx \
 
 ---
 
-## BDD100K 評価
+## BDD100K evaluation
 
-**val mirror の取得** (Hugging Face、約 1GB):
+**Fetch the val mirror** (Hugging Face, ~1GB):
 
 ```bash
 python scripts/prepare_bdd100k.py --download-val --data-root data/bdd100k
 ```
 
-**評価例** (odd 5,000 report split):
+**Evaluation example** (odd 5,000 report split):
 
 ```bash
 python scripts/evaluate_bdd100k.py \
@@ -180,59 +180,59 @@ python scripts/evaluate_bdd100k.py \
   --output outputs/bdd100k_eval.json
 ```
 
-### 公式 train で再学習（任意・当面スキップ可）
+### Retrain on the official train split (optional, can be skipped for now)
 
-1. [BDD100K 公式](https://bdd-data.berkeley.edu/) から train 画像 + labels を取得
-2. 以下に配置:
+1. Get the train images + labels from the [official BDD100K site](https://bdd-data.berkeley.edu/)
+2. Place them as follows:
 
 ```text
 data/bdd100k/images/100k/train/
 data/bdd100k/labels/det_20/det_train.json
-data/bdd100k/images/100k/val/          # prepare --download-val で可
+data/bdd100k/images/100k/val/          # available via prepare --download-val
 data/bdd100k/labels/det_20/det_val.json
 ```
 
-3. 実行:
+3. Run:
 
 ```bash
 bash scripts/bootstrap_bdd100k_official_train.sh
 RUN_TRAIN=1 bash scripts/bootstrap_bdd100k_official_train.sh 10
 ```
 
-`adas_yolov8n_bdd100k.pt` が無い場合は `yolov8n.pt` から fine-tune します。
+If `adas_yolov8n_bdd100k.pt` is missing, fine-tuning starts from `yolov8n.pt`.
 
 ---
 
-## 主要スクリプト
+## Main scripts
 
-| スクリプト | 用途 |
+| Script | Purpose |
 |---|---|
-| `scripts/demo_image.py` / `demo_video.py` | 画像・動画デモ |
+| `scripts/demo_image.py` / `demo_video.py` | Image / video demos |
 | `scripts/replay_planning_json.py` | perception JSON → planning JSON |
-| `scripts/demo_planning_video.py` | planning overlay 動画 |
-| `scripts/evaluate_bdd100k.py` | BDD100K 評価 |
-| `scripts/evaluate_lane.py` | 車線 detector 比較 |
-| `scripts/benchmark.py` | FPS / レイテンシ計測 |
-| `scripts/export_yolo_onnx.py` | YOLO → ONNX export (Jetson 向け) |
-| `scripts/prepare_bdd100k.py` | データ配置・検証 |
+| `scripts/demo_planning_video.py` | Planning overlay video |
+| `scripts/evaluate_bdd100k.py` | BDD100K evaluation |
+| `scripts/evaluate_lane.py` | Lane detector comparison |
+| `scripts/benchmark.py` | FPS / latency measurement |
+| `scripts/export_yolo_onnx.py` | YOLO → ONNX export (for Jetson) |
+| `scripts/prepare_bdd100k.py` | Data placement / validation |
 
 ---
 
-## ディレクトリ（最小）
+## Directory layout (minimal)
 
 ```text
-adas_perception/     # 認識パイプライン
+adas_perception/     # perception pipeline
 adas_planning/       # rule-based planning
-configs/             # YAML 設定
+configs/             # YAML configs
 scripts/             # CLI
 scenarios/           # planning scenario YAML
 tests/               # pytest
-PLAN.md              # 実験記録・次タスク（詳細はこちら）
+PLAN.md              # experiment log / next tasks (details here)
 ```
 
 ---
 
-## テスト
+## Tests
 
 ```bash
 pytest -q -k "not slow"
@@ -241,12 +241,12 @@ python scripts/eval_planning_scenarios.py --scenarios-dir scenarios --output out
 
 ---
 
-## 制約
+## Limitations
 
-- 単眼距離・planning 出力は **粗い推定 / recommendation** であり、実車 ADAS 性能を意味しません
-- `data/`・`outputs/`・`*.pt`・`*.onnx` は gitignore（大容量）
-- 実験の長い changelog は README ではなく [PLAN.md](PLAN.md) に集約
+- Monocular distance and planning outputs are **rough estimates / recommendations** and do not imply real-vehicle ADAS performance
+- `data/`, `outputs/`, `*.pt`, `*.onnx` are gitignored (large files)
+- Long experiment changelogs are consolidated in [PLAN.md](PLAN.md), not the README
 
-## ライセンス・データ
+## License / data
 
-BDD100K 利用時は [公式ライセンス](https://bdd-data.berkeley.edu/) に従ってください。デモ動画素材: [Pexels CC0](https://www.pexels.com/video/dash-cam-view-of-the-road-5921059/).
+When using BDD100K, follow the [official license](https://bdd-data.berkeley.edu/). Demo video footage: [Pexels CC0](https://www.pexels.com/video/dash-cam-view-of-the-road-5921059/).
