@@ -1,0 +1,16 @@
+schema_version: planning_scenario.v0.1
+name: pseudo_ego_config_default
+description: Aggressive config default ego speed should produce target_speed caps on close lead.
+perception_json: tests/fixtures/planning/lead_close.json
+config: configs/planning/aggressive_demo.yaml
+checks:
+  - name: target_speed_from_config_default
+    type: target_speed_rate
+    frame_indices: [0, 1, 2, 3, 4, 5]
+    min_rate: 1.0
+  - name: config_default_source
+    type: debug_field_rate
+    field: ego_speed_source
+    value: config_default
+    frame_indices: [0, 1, 2, 3, 4, 5]
+    min_rate: 1.0

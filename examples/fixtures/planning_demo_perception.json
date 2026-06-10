@@ -1,0 +1,2631 @@
+{
+  "schema_version": "0.1",
+  "video": {
+    "width": 640,
+    "height": 360,
+    "fps": 10.0,
+    "frame_count": 40
+  },
+  "frames": [
+    {
+      "frame_index": 0,
+      "timestamp_ms": 0.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                190,
+                350
+              ],
+              [
+                220,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                450,
+                350
+              ],
+              [
+                420,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            190,
+            350
+          ],
+          [
+            450,
+            350
+          ],
+          [
+            420,
+            162
+          ],
+          [
+            220,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 1,
+      "timestamp_ms": 100.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                191,
+                350
+              ],
+              [
+                221,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                449,
+                350
+              ],
+              [
+                419,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            191,
+            350
+          ],
+          [
+            449,
+            350
+          ],
+          [
+            419,
+            162
+          ],
+          [
+            221,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 2,
+      "timestamp_ms": 200.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                192,
+                350
+              ],
+              [
+                222,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                448,
+                350
+              ],
+              [
+                418,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            192,
+            350
+          ],
+          [
+            448,
+            350
+          ],
+          [
+            418,
+            162
+          ],
+          [
+            222,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 3,
+      "timestamp_ms": 300.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                194,
+                350
+              ],
+              [
+                224,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                446,
+                350
+              ],
+              [
+                416,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            194,
+            350
+          ],
+          [
+            446,
+            350
+          ],
+          [
+            416,
+            162
+          ],
+          [
+            224,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 4,
+      "timestamp_ms": 400.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                195,
+                350
+              ],
+              [
+                225,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                445,
+                350
+              ],
+              [
+                415,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            195,
+            350
+          ],
+          [
+            445,
+            350
+          ],
+          [
+            415,
+            162
+          ],
+          [
+            225,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 5,
+      "timestamp_ms": 500.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                196,
+                350
+              ],
+              [
+                226,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                444,
+                350
+              ],
+              [
+                414,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            196,
+            350
+          ],
+          [
+            444,
+            350
+          ],
+          [
+            414,
+            162
+          ],
+          [
+            226,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 6,
+      "timestamp_ms": 600.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                197,
+                350
+              ],
+              [
+                227,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                443,
+                350
+              ],
+              [
+                413,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            197,
+            350
+          ],
+          [
+            443,
+            350
+          ],
+          [
+            413,
+            162
+          ],
+          [
+            227,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 7,
+      "timestamp_ms": 700.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                197,
+                350
+              ],
+              [
+                227,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                443,
+                350
+              ],
+              [
+                413,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            197,
+            350
+          ],
+          [
+            443,
+            350
+          ],
+          [
+            413,
+            162
+          ],
+          [
+            227,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 8,
+      "timestamp_ms": 800.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                197,
+                350
+              ],
+              [
+                227,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                443,
+                350
+              ],
+              [
+                413,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            197,
+            350
+          ],
+          [
+            443,
+            350
+          ],
+          [
+            413,
+            162
+          ],
+          [
+            227,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 9,
+      "timestamp_ms": 900.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                197,
+                350
+              ],
+              [
+                227,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                443,
+                350
+              ],
+              [
+                413,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            197,
+            350
+          ],
+          [
+            443,
+            350
+          ],
+          [
+            413,
+            162
+          ],
+          [
+            227,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 10,
+      "timestamp_ms": 1000.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                197,
+                350
+              ],
+              [
+                227,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                443,
+                350
+              ],
+              [
+                413,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            197,
+            350
+          ],
+          [
+            443,
+            350
+          ],
+          [
+            413,
+            162
+          ],
+          [
+            227,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 11,
+      "timestamp_ms": 1100.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                197,
+                350
+              ],
+              [
+                227,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                443,
+                350
+              ],
+              [
+                413,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            197,
+            350
+          ],
+          [
+            443,
+            350
+          ],
+          [
+            413,
+            162
+          ],
+          [
+            227,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 12,
+      "timestamp_ms": 1200.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                196,
+                350
+              ],
+              [
+                226,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                444,
+                350
+              ],
+              [
+                414,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            196,
+            350
+          ],
+          [
+            444,
+            350
+          ],
+          [
+            414,
+            162
+          ],
+          [
+            226,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 14.0,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 13,
+      "timestamp_ms": 1300.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                195,
+                350
+              ],
+              [
+                225,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                445,
+                350
+              ],
+              [
+                415,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            195,
+            350
+          ],
+          [
+            445,
+            350
+          ],
+          [
+            415,
+            162
+          ],
+          [
+            225,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 13.2,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 14,
+      "timestamp_ms": 1400.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                194,
+                350
+              ],
+              [
+                224,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                446,
+                350
+              ],
+              [
+                416,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            194,
+            350
+          ],
+          [
+            446,
+            350
+          ],
+          [
+            416,
+            162
+          ],
+          [
+            224,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 12.4,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 15,
+      "timestamp_ms": 1500.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                193,
+                350
+              ],
+              [
+                223,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                447,
+                350
+              ],
+              [
+                417,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            193,
+            350
+          ],
+          [
+            447,
+            350
+          ],
+          [
+            417,
+            162
+          ],
+          [
+            223,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 11.6,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 16,
+      "timestamp_ms": 1600.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                192,
+                350
+              ],
+              [
+                222,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                448,
+                350
+              ],
+              [
+                418,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            192,
+            350
+          ],
+          [
+            448,
+            350
+          ],
+          [
+            418,
+            162
+          ],
+          [
+            222,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 10.8,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 17,
+      "timestamp_ms": 1700.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                190,
+                350
+              ],
+              [
+                220,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                450,
+                350
+              ],
+              [
+                420,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            190,
+            350
+          ],
+          [
+            450,
+            350
+          ],
+          [
+            420,
+            162
+          ],
+          [
+            220,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 10.0,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 18,
+      "timestamp_ms": 1800.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                190,
+                350
+              ],
+              [
+                220,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                450,
+                350
+              ],
+              [
+                420,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            190,
+            350
+          ],
+          [
+            450,
+            350
+          ],
+          [
+            420,
+            162
+          ],
+          [
+            220,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 9.2,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 19,
+      "timestamp_ms": 1900.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                188,
+                350
+              ],
+              [
+                218,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                452,
+                350
+              ],
+              [
+                422,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            188,
+            350
+          ],
+          [
+            452,
+            350
+          ],
+          [
+            422,
+            162
+          ],
+          [
+            218,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 8.399999999999999,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 20,
+      "timestamp_ms": 2000.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                187,
+                350
+              ],
+              [
+                217,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                453,
+                350
+              ],
+              [
+                423,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            187,
+            350
+          ],
+          [
+            453,
+            350
+          ],
+          [
+            423,
+            162
+          ],
+          [
+            217,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 7.6,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 21,
+      "timestamp_ms": 2100.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                186,
+                350
+              ],
+              [
+                216,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                454,
+                350
+              ],
+              [
+                424,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            186,
+            350
+          ],
+          [
+            454,
+            350
+          ],
+          [
+            424,
+            162
+          ],
+          [
+            216,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 6.8,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 22,
+      "timestamp_ms": 2200.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                185,
+                350
+              ],
+              [
+                215,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                455,
+                350
+              ],
+              [
+                425,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            185,
+            350
+          ],
+          [
+            455,
+            350
+          ],
+          [
+            425,
+            162
+          ],
+          [
+            215,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "vehicle",
+          "label": "car",
+          "confidence": 0.88,
+          "track_id": 7,
+          "distance_m": 6.0,
+          "box": {
+            "x1": 285,
+            "y1": 195,
+            "x2": 355,
+            "y2": 250,
+            "width": 70,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 23,
+      "timestamp_ms": 2300.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                184,
+                350
+              ],
+              [
+                214,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                456,
+                350
+              ],
+              [
+                426,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            184,
+            350
+          ],
+          [
+            456,
+            350
+          ],
+          [
+            426,
+            162
+          ],
+          [
+            214,
+            162
+          ]
+        ]
+      },
+      "detections": []
+    },
+    {
+      "frame_index": 24,
+      "timestamp_ms": 2400.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                183,
+                350
+              ],
+              [
+                213,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                457,
+                350
+              ],
+              [
+                427,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            183,
+            350
+          ],
+          [
+            457,
+            350
+          ],
+          [
+            427,
+            162
+          ],
+          [
+            213,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "pedestrian",
+          "label": "person",
+          "confidence": 0.78,
+          "track_id": 99,
+          "distance_m": 18.0,
+          "box": {
+            "x1": 328,
+            "y1": 220,
+            "x2": 352,
+            "y2": 280,
+            "width": 24,
+            "height": 60
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 25,
+      "timestamp_ms": 2500.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                183,
+                350
+              ],
+              [
+                213,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                457,
+                350
+              ],
+              [
+                427,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            183,
+            350
+          ],
+          [
+            457,
+            350
+          ],
+          [
+            427,
+            162
+          ],
+          [
+            213,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "pedestrian",
+          "label": "person",
+          "confidence": 0.78,
+          "track_id": 99,
+          "distance_m": 16.0,
+          "box": {
+            "x1": 328,
+            "y1": 220,
+            "x2": 352,
+            "y2": 280,
+            "width": 24,
+            "height": 60
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 26,
+      "timestamp_ms": 2600.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                183,
+                350
+              ],
+              [
+                213,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                457,
+                350
+              ],
+              [
+                427,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            183,
+            350
+          ],
+          [
+            457,
+            350
+          ],
+          [
+            427,
+            162
+          ],
+          [
+            213,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "pedestrian",
+          "label": "person",
+          "confidence": 0.78,
+          "track_id": 99,
+          "distance_m": 14.0,
+          "box": {
+            "x1": 328,
+            "y1": 220,
+            "x2": 352,
+            "y2": 280,
+            "width": 24,
+            "height": 60
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 27,
+      "timestamp_ms": 2700.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                183,
+                350
+              ],
+              [
+                213,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                457,
+                350
+              ],
+              [
+                427,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            183,
+            350
+          ],
+          [
+            457,
+            350
+          ],
+          [
+            427,
+            162
+          ],
+          [
+            213,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "pedestrian",
+          "label": "person",
+          "confidence": 0.78,
+          "track_id": 99,
+          "distance_m": 12.0,
+          "box": {
+            "x1": 328,
+            "y1": 220,
+            "x2": 352,
+            "y2": 280,
+            "width": 24,
+            "height": 60
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 28,
+      "timestamp_ms": 2800.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                183,
+                350
+              ],
+              [
+                213,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                457,
+                350
+              ],
+              [
+                427,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            183,
+            350
+          ],
+          [
+            457,
+            350
+          ],
+          [
+            427,
+            162
+          ],
+          [
+            213,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "red",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 29,
+      "timestamp_ms": 2900.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                184,
+                350
+              ],
+              [
+                214,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                456,
+                350
+              ],
+              [
+                426,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            184,
+            350
+          ],
+          [
+            456,
+            350
+          ],
+          [
+            426,
+            162
+          ],
+          [
+            214,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "red",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 30,
+      "timestamp_ms": 3000.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                184,
+                350
+              ],
+              [
+                214,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                456,
+                350
+              ],
+              [
+                426,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            184,
+            350
+          ],
+          [
+            456,
+            350
+          ],
+          [
+            426,
+            162
+          ],
+          [
+            214,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "red",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 31,
+      "timestamp_ms": 3100.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                185,
+                350
+              ],
+              [
+                215,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                455,
+                350
+              ],
+              [
+                425,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            185,
+            350
+          ],
+          [
+            455,
+            350
+          ],
+          [
+            425,
+            162
+          ],
+          [
+            215,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "red",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 32,
+      "timestamp_ms": 3200.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                187,
+                350
+              ],
+              [
+                217,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                453,
+                350
+              ],
+              [
+                423,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            187,
+            350
+          ],
+          [
+            453,
+            350
+          ],
+          [
+            423,
+            162
+          ],
+          [
+            217,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "red",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 33,
+      "timestamp_ms": 3300.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                188,
+                350
+              ],
+              [
+                218,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                452,
+                350
+              ],
+              [
+                422,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            188,
+            350
+          ],
+          [
+            452,
+            350
+          ],
+          [
+            422,
+            162
+          ],
+          [
+            218,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "red",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 34,
+      "timestamp_ms": 3400.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                189,
+                350
+              ],
+              [
+                219,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                451,
+                350
+              ],
+              [
+                421,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            189,
+            350
+          ],
+          [
+            451,
+            350
+          ],
+          [
+            421,
+            162
+          ],
+          [
+            219,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "green",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 35,
+      "timestamp_ms": 3500.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                190,
+                350
+              ],
+              [
+                220,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                450,
+                350
+              ],
+              [
+                420,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            190,
+            350
+          ],
+          [
+            450,
+            350
+          ],
+          [
+            420,
+            162
+          ],
+          [
+            220,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "green",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 36,
+      "timestamp_ms": 3600.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                191,
+                350
+              ],
+              [
+                221,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                449,
+                350
+              ],
+              [
+                419,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            191,
+            350
+          ],
+          [
+            449,
+            350
+          ],
+          [
+            419,
+            162
+          ],
+          [
+            221,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "green",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 37,
+      "timestamp_ms": 3700.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                192,
+                350
+              ],
+              [
+                222,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                448,
+                350
+              ],
+              [
+                418,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            192,
+            350
+          ],
+          [
+            448,
+            350
+          ],
+          [
+            418,
+            162
+          ],
+          [
+            222,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "green",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 38,
+      "timestamp_ms": 3800.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                194,
+                350
+              ],
+              [
+                224,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                446,
+                350
+              ],
+              [
+                416,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            194,
+            350
+          ],
+          [
+            446,
+            350
+          ],
+          [
+            416,
+            162
+          ],
+          [
+            224,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "green",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    },
+    {
+      "frame_index": 39,
+      "timestamp_ms": 3900.0,
+      "lanes": {
+        "lines": [
+          {
+            "side": "left",
+            "points": [
+              [
+                195,
+                350
+              ],
+              [
+                225,
+                162
+              ]
+            ],
+            "confidence": 0.82
+          },
+          {
+            "side": "right",
+            "points": [
+              [
+                445,
+                350
+              ],
+              [
+                415,
+                162
+              ]
+            ],
+            "confidence": 0.8
+          }
+        ],
+        "polygon": [
+          [
+            195,
+            350
+          ],
+          [
+            445,
+            350
+          ],
+          [
+            415,
+            162
+          ],
+          [
+            225,
+            162
+          ]
+        ]
+      },
+      "detections": [
+        {
+          "kind": "traffic_light",
+          "label": "traffic light",
+          "confidence": 0.85,
+          "state": "green",
+          "box": {
+            "x1": 305,
+            "y1": 40,
+            "x2": 335,
+            "y2": 95,
+            "width": 30,
+            "height": 55
+          }
+        }
+      ]
+    }
+  ]
+}

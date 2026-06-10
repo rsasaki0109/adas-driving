@@ -1,0 +1,21 @@
+schema_version: planning_scenario.v0.1
+name: red_light_stop
+description: Sustained red detections should debounce into STOP_FOR_RED.
+perception_json: tests/fixtures/planning/red_light_sequence.json
+config: configs/planning/default.yaml
+checks:
+  - name: debounced_stop
+    type: behavior_rate
+    behavior: STOP_FOR_RED
+    frame_indices: [3, 4, 5, 6, 7]
+    min_rate: 1.0
+  - name: no_early_stop
+    type: max_behavior_rate
+    behavior: STOP_FOR_RED
+    frame_indices: [0, 1]
+    max_rate: 0.0
+  - name: stop_warning
+    type: warning_rate
+    code: STOP_RECOMMENDATION
+    frame_indices: [3, 4, 5, 6, 7]
+    min_rate: 1.0

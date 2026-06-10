@@ -1,0 +1,16 @@
+schema_version: planning_scenario.v0.1
+name: lead_follow_warning
+description: Close lead vehicle should trigger FOLLOW_LEAD and distance warning.
+perception_json: tests/fixtures/planning/lead_close.json
+config: configs/planning/default.yaml
+checks:
+  - name: follow_behavior
+    type: behavior_rate
+    behavior: FOLLOW_LEAD
+    frame_indices: [0, 1, 2, 3, 4, 5]
+    min_rate: 1.0
+  - name: distance_warning
+    type: warning_rate
+    code: FOLLOW_DISTANCE
+    frame_indices: [0, 1, 2, 3, 4, 5]
+    min_rate: 1.0
