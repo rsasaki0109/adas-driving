@@ -1,9 +1,72 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Any
 
+import numpy as np
+
 from adas_perception.types import Box, Detection
+
+
+def _box_to_cxcywh(box: Box) -> tuple[float, float, float, float]:
+    w = float(box.x2 - box.x1)
+    h = float(box.y2 - box.y1)
+    return (float(box.x1) + 0.5 * w, float(box.y1) + 0.5 * h, w, h)
+
+
+def _cxcywh_to_box(state: np.ndarray) -> Box:
+    cx, cy, w, h = (float(v) for v in state[:4])
+    w = max(1.0, w)
+    h = max(1.0, h)
+    return Box(
+        x1=int(round(cx - 0.5 * w)),
+        y1=int(round(cy - 0.5 * h)),
+        x2=int(round(cx + 0.5 * w)),
+        y2=int(round(cy + 0.5 * h)),
+    )
+
+
+class _BoxKalmanFilter:
+    """Constant-velocity Kalman filter over (cx, cy, w, h).
+
+    Noise standard deviations scale with box height (DeepSORT convention),
+    so the filter behaves consistently for near/large and far/small objects.
+    Unlike the one-step linear extrapolation, the velocity estimate is
+    smoothed over the track's lifetime and keeps advancing while the track
+    coasts through missed frames.
+    """
+
+    _STD_POSITION = 1.0 / 20.0
+    _STD_VELOCITY = 1.0 / 160.0
+
+    def __init__(self, box: Box):
+        cx, cy, w, h = _box_to_cxcywh(box)
+        self.x = np.array([cx, cy, w, h, 0.0, 0.0, 0.0, 0.0], dtype=float)
+        self.F = np.eye(8, dtype=float)
+        self.F[:4, 4:] = np.eye(4, dtype=float)
+        self.H = np.eye(4, 8, dtype=float)
+        ref = max(1.0, h)
+        std = [2.0 * self._STD_POSITION * ref] * 4 + [10.0 * self._STD_VELOCITY * ref] * 4
+        self.P = np.diag(np.square(np.array(std, dtype=float)))
+
+    def predict(self) -> Box:
+        ref = max(1.0, float(self.x[3]))
+        std = [self._STD_POSITION * ref] * 4 + [self._STD_VELOCITY * ref] * 4
+        process_noise = np.diag(np.square(np.array(std, dtype=float)))
+        self.x = self.F @ self.x
+        self.P = self.F @ self.P @ self.F.T + process_noise
+        return _cxcywh_to_box(self.x)
+
+    def update(self, box: Box) -> None:
+        z = np.array(_box_to_cxcywh(box), dtype=float)
+        ref = max(1.0, float(z[3]))
+        measurement_noise = np.diag(
+            np.square(np.full(4, self._STD_POSITION * ref, dtype=float))
+        )
+        innovation_cov = self.H @ self.P @ self.H.T + measurement_noise
+        gain = self.P @ self.H.T @ np.linalg.inv(innovation_cov)
+        self.x = self.x + gain @ (z - self.H @ self.x)
+        self.P = (np.eye(8, dtype=float) - gain @ self.H) @ self.P
 
 
 @dataclass
@@ -14,6 +77,7 @@ class _Track:
     box: Box
     prev_box: Box | None = None
     missed: int = 0
+    kf: _BoxKalmanFilter | None = field(default=None, repr=False)
 
     def predicted_box(self) -> Box:
         if self.prev_box is None:
@@ -40,7 +104,12 @@ class SimpleTracker:
       max_missed (int, default 8)
       kinds (list[str], default [vehicle, pedestrian])
       motion_prediction (bool, default True): propagate the last observed
-        box by one step using linear velocity before IoU-matching.
+        box by one step before IoU-matching.
+      motion_model (str, default "kalman"): "kalman" predicts with a
+        constant-velocity Kalman filter (smoothed velocity, keeps coasting
+        through missed frames); "linear" keeps the previous one-step
+        extrapolation from the last two observed boxes. Only used when
+        motion_prediction is true.
       centroid_distance_fraction (float, default 0.0): fallback threshold on
         centroid distance, expressed as fraction of the mean box diagonal.
         0 disables the fallback (matches the previous IoU-only behavior).
@@ -60,6 +129,7 @@ class SimpleTracker:
         self.max_missed = int(config.get("max_missed", 8))
         self.kinds = set(config.get("kinds", ["vehicle", "pedestrian"]))
         self.motion_prediction = bool(config.get("motion_prediction", True))
+        self.motion_model = str(config.get("motion_model", "kalman")).lower()
         self.centroid_distance_fraction = float(config.get("centroid_distance_fraction", 0.0))
         self.two_stage = bool(config.get("two_stage", False))
         self.high_score_threshold = float(config.get("high_score_threshold", 0.50))
@@ -72,7 +142,15 @@ class SimpleTracker:
         self._tracks.clear()
 
     def _match_box(self, track: _Track) -> Box:
-        return track.predicted_box() if self.motion_prediction else track.box
+        if not self.motion_prediction:
+            return track.box
+        if self.motion_model == "kalman":
+            if track.kf is None:
+                track.kf = _BoxKalmanFilter(track.box)
+            # Advances the filter by one step; called once per track per
+            # update() because match boxes are computed once up front.
+            return track.kf.predict()
+        return track.predicted_box()
 
     def update(self, detections: list[Detection]) -> list[Detection]:
         if not self.enabled:
@@ -188,6 +266,8 @@ class SimpleTracker:
             track.box = detection.box
             track.label = detection.label
             track.missed = 0
+            if track.kf is not None:
+                track.kf.update(detection.box)
             assigned_track_indexes.add(track_index)
             assigned_detection_indexes.add(detection_index)
             updated[detection_index] = replace(detection, track_id=track.track_id)
@@ -229,6 +309,8 @@ class SimpleTracker:
             track.box = detection.box
             track.label = detection.label
             track.missed = 0
+            if track.kf is not None:
+                track.kf.update(detection.box)
             assigned_track_indexes.add(track_index)
             assigned_detection_indexes.add(detection_index)
             updated[detection_index] = replace(detection, track_id=track.track_id)

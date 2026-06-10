@@ -43,6 +43,39 @@ def test_tracker_centroid_fallback_recovers_low_iou_match():
     assert recovered[0].track_id == 1
 
 
+def test_kalman_tracker_coasts_through_missed_frames():
+    tracker = SimpleTracker(
+        {
+            "enabled": True,
+            "motion_prediction": True,
+            "motion_model": "kalman",
+        }
+    )
+    for x in (0, 30, 60, 90):
+        result = tracker.update([_vehicle(x, 100, x + 100, 200)])
+    assert result[0].track_id == 1
+    tracker.update([])
+    tracker.update([])
+    recovered = tracker.update([_vehicle(180, 100, 280, 200)])
+    assert recovered[0].track_id == 1
+
+
+def test_linear_tracker_loses_fast_track_after_missed_frames():
+    tracker = SimpleTracker(
+        {
+            "enabled": True,
+            "motion_prediction": True,
+            "motion_model": "linear",
+        }
+    )
+    for x in (0, 30, 60, 90):
+        tracker.update([_vehicle(x, 100, x + 100, 200)])
+    tracker.update([])
+    tracker.update([])
+    recovered = tracker.update([_vehicle(180, 100, 280, 200)])
+    assert recovered[0].track_id != 1
+
+
 def test_iou_and_centroid_helpers():
     box_a = Box(0, 0, 100, 100)
     box_b = Box(50, 50, 150, 150)
